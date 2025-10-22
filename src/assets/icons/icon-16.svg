@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient16" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="8" cy="8" r="8" fill="url(#bgGradient16)"/>
+  
+  <!-- Stars (for larger icons) -->
+  
+  
+  <!-- Moon (full circle) -->
+  <circle cx="8" cy="8" r="4.8" fill="#ffd700"/>
+  
+  <!-- Cutout to create crescent -->
+  <circle cx="9.44" cy="7.52" r="4.363636363636363" fill="url(#bgGradient16)"/>
+</svg>

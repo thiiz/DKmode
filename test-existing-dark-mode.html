@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Existing Dark Mode Test - Dark Theme Extension</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f5f5f5;
+      --text-primary: #000000;
+      --text-secondary: #666666;
+      --border-color: #dddddd;
+      --accent-color: #007bff;
+    }
+
+    body.native-dark-mode {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --text-primary: #ffffff;
+      --text-secondary: #b0b0b0;
+      --border-color: #404040;
+      --accent-color: #4da3ff;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      background-color: var(--bg-secondary);
+      padding: 20px;
+      border-bottom: 2px solid var(--border-color);
+      margin-bottom: 30px;
+      border-radius: 8px;
+    }
+
+    .theme-toggle-section {
+      background-color: var(--bg-secondary);
+      padding: 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+
+    .toggle-button {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+
+    .toggle-button:hover {
+      opacity: 0.8;
+    }
+
+    .card {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .card h3 {
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .info-box {
+      background-color: var(--bg-secondary);
+      border-left: 4px solid var(--accent-color);
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+
+    .warning-box {
+      background-color: var(--bg-secondary);
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+
+    input,
+    textarea,
+    select {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      border-radius: 4px;
+      width: 100%;
+      margin: 8px 0;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    button.secondary {
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+      transition: background-color 0.2s;
+    }
+
+    button.secondary:hover {
+      background-color: var(--bg-primary);
+    }
+
+    .code-block {
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 15px;
+      margin: 15px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      overflow-x: auto;
+      color: var(--text-primary);
+    }
+
+    a {
+      color: var(--accent-color);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    th {
+      background-color: var(--bg-secondary);
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    td {
+      color: var(--text-secondary);
+    }
+
+    .status-indicator {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-active {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .status-pending {
+      background-color: #ffc107;
+      color: #000;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .grid-item {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .metric-value {
+      font-size: 32px;
+      font-weight: bold;
+      color: var(--accent-color);
+      margin: 10px 0;
+    }
+
+    .metric-label {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Existing Dark Mode Test</h1>
+      <p style="color: var(--text-secondary); margin-top: 10px;">
+        This page has its own native dark mode implementation using CSS variables
+      </p>
+    </div>
+
+    <div class="theme-toggle-section">
+      <h2 style="margin-bottom: 15px;">Native Dark Mode Control</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 15px;">
+        Toggle the site's built-in dark mode to test how it interacts with the extension's dark theme.
+      </p>
+      <button class="toggle-button" onclick="toggleNativeDarkMode()">
+        Toggle Native Dark Mode
+      </button>
+      <p id="mode-status" style="margin-top: 15px; font-weight: 600;">
+        Current Mode: <span id="current-mode">Light</span>
+      </p>
+    </div>
+
+    <div class="warning-box">
+      <h3 style="margin-bottom: 10px;">⚠️ Testing Scenario</h3>
+      <p>This page simulates websites that already have their own dark mode (like GitHub, Twitter, YouTube, etc.).</p>
+      <p style="margin-top: 10px;"><strong>Test Cases:</strong></p>
+      <ol style="margin: 10px 0 0 20px; color: var(--text-secondary);">
+        <li>Enable the site's native dark mode, then enable the extension's dark theme</li>
+        <li>Check if there's double-inversion or visual conflicts</li>
+        <li>Verify that the extension's dark theme works well with or without native dark mode</li>
+        <li>Test different intensity levels with both modes enabled</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h3>Content Section 1</h3>
+      <p>This is a paragraph of text that should adapt to both the native dark mode and the extension's dark theme. The
+        colors are controlled by CSS variables that change based on the native dark mode state.</p>
+      <p style="margin-top: 10px;">When the extension's dark theme is applied on top of the native dark mode, we need to
+        ensure there's no double-inversion that makes the page unreadable.</p>
+    </div>
+
+    <div class="card">
+      <h3>Form Elements</h3>
+      <form>
+        <label for="name" style="display: block; margin-bottom: 5px;">Name:</label>
+        <input type="text" id="name" placeholder="Enter your name">
+
+        <label for="email" style="display: block; margin-bottom: 5px; margin-top: 15px;">Email:</label>
+        <input type="email" id="email" placeholder="your@email.com">
+
+        <label for="message" style="display: block; margin-bottom: 5px; margin-top: 15px;">Message:</label>
+        <textarea id="message" rows="4" placeholder="Enter your message"></textarea>
+
+        <label for="category" style="display: block; margin-bottom: 5px; margin-top: 15px;">Category:</label>
+        <select id="category">
+          <option>General</option>
+          <option>Support</option>
+          <option>Feedback</option>
+        </select>
+
+        <div style="margin-top: 15px;">
+          <button type="button" class="toggle-button">Submit</button>
+          <button type="button" class="secondary">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Code Block</h3>
+      <p style="margin-bottom: 10px;">Code blocks should remain readable in both modes:</p>
+      <div class="code-block">
+        :root {<br>
+        &nbsp;&nbsp;--bg-primary: #ffffff;<br>
+        &nbsp;&nbsp;--text-primary: #000000;<br>
+        }<br>
+        <br>
+        body.native-dark-mode {<br>
+        &nbsp;&nbsp;--bg-primary: #1a1a1a;<br>
+        &nbsp;&nbsp;--text-primary: #ffffff;<br>
+        }
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Data Table</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Status</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Native Dark Mode</td>
+            <td><span class="status-indicator status-active">Active</span></td>
+            <td>High</td>
+          </tr>
+          <tr>
+            <td>Extension Dark Theme</td>
+            <td><span class="status-indicator status-pending">Testing</span></td>
+            <td>High</td>
+          </tr>
+          <tr>
+            <td>Compatibility Check</td>
+            <td><span class="status-indicator status-pending">In Progress</span></td>
+            <td>Medium</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Metrics Dashboard</h3>
+      <div class="grid">
+        <div class="grid-item">
+          <div class="metric-label">Total Users</div>
+          <div class="metric-value">1,234</div>
+        </div>
+        <div class="grid-item">
+          <div class="metric-label">Active Sessions</div>
+          <div class="metric-value">567</div>
+        </div>
+        <div class="grid-item">
+          <div class="metric-label">Page Views</div>
+          <div class="metric-value">8,901</div>
+        </div>
+        <div class="grid-item">
+          <div class="metric-label">Conversion Rate</div>
+          <div class="metric-value">3.2%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <h3 style="margin-bottom: 10px;">ℹ️ Expected Behavior</h3>
+      <p><strong>Scenario 1: Native Dark Mode OFF + Extension Dark Theme ON</strong></p>
+      <p style="margin: 5px 0 0 20px; color: var(--text-secondary);">
+        The extension should invert the light theme colors to create a dark appearance.
+      </p>
+
+      <p style="margin-top: 15px;"><strong>Scenario 2: Native Dark Mode ON + Extension Dark Theme OFF</strong></p>
+      <p style="margin: 5px 0 0 20px; color: var(--text-secondary);">
+        The page should display in its native dark mode without extension interference.
+      </p>
+
+      <p style="margin-top: 15px;"><strong>Scenario 3: Native Dark Mode ON + Extension Dark Theme ON</strong></p>
+      <p style="margin: 5px 0 0 20px; color: var(--text-secondary);">
+        This is the critical test case. The extension should either:
+        <br>• Detect existing dark mode and skip application, OR
+        <br>• Apply its theme in a way that doesn't cause double-inversion
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Links and Navigation</h3>
+      <p>Test links in both modes:</p>
+      <ul style="margin: 10px 0 0 20px; color: var(--text-secondary);">
+        <li><a href="#home">Home Page</a></li>
+        <li><a href="#about">About Us</a></li>
+        <li><a href="#services">Our Services</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Button Variations</h3>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+        <button class="toggle-button">Primary Action</button>
+        <button class="secondary">Secondary Action</button>
+        <button class="toggle-button" style="background-color: #28a745;">Success</button>
+        <button class="toggle-button" style="background-color: #dc3545;">Danger</button>
+        <button class="toggle-button" style="background-color: #ffc107; color: #000;">Warning</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let nativeDarkModeEnabled = false;
+
+    function toggleNativeDarkMode() {
+      nativeDarkModeEnabled = !nativeDarkModeEnabled;
+      document.body.classList.toggle('native-dark-mode', nativeDarkModeEnabled);
+
+      const modeText = document.getElementById('current-mode');
+      modeText.textContent = nativeDarkModeEnabled ? 'Dark' : 'Light';
+
+      console.log('Native dark mode:', nativeDarkModeEnabled ? 'ENABLED' : 'DISABLED');
+    }
+
+    // Check for system preference
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      console.log('System prefers dark mode');
+    }
+
+    console.log('Existing dark mode test page loaded');
+    console.log('');
+    console.log('Test Instructions:');
+    console.log('1. Toggle the native dark mode using the button above');
+    console.log('2. Enable/disable the extension\'s dark theme');
+    console.log('3. Test all four combinations:');
+    console.log('   - Native OFF + Extension OFF (baseline)');
+    console.log('   - Native OFF + Extension ON');
+    console.log('   - Native ON + Extension OFF');
+    console.log('   - Native ON + Extension ON (critical test)');
+    console.log('4. Verify no double-inversion or readability issues');
+    console.log('5. Test different intensity levels in each scenario');
+  </script>
+</body>
+
+</html>

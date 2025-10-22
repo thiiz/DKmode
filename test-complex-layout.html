@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complex Layout Test - Dark Theme Extension</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #ffffff;
+      color: #24292e;
+    }
+
+    /* GitHub-like header */
+    .header {
+      background-color: #24292e;
+      color: white;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e1e4e8;
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 20px;
+    }
+
+    .header-nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .header-search {
+      background-color: #fafbfc;
+      border: 1px solid #e1e4e8;
+      border-radius: 6px;
+      padding: 8px 12px;
+      width: 300px;
+      color: #24292e;
+    }
+
+    /* Gmail-like sidebar */
+    .container {
+      display: flex;
+      height: calc(100vh - 60px);
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #f6f8fa;
+      border-right: 1px solid #e1e4e8;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .sidebar-item {
+      padding: 10px 15px;
+      margin: 5px 0;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background-color: white;
+      border: 1px solid #e1e4e8;
+    }
+
+    .sidebar-item:hover {
+      background-color: #f3f4f6;
+    }
+
+    .sidebar-item.active {
+      background-color: #0366d6;
+      color: white;
+      border-color: #0366d6;
+    }
+
+    .badge {
+      background-color: #0366d6;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      margin-left: auto;
+    }
+
+    /* Twitter-like feed */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      background-color: #ffffff;
+    }
+
+    .content-header {
+      background-color: #ffffff;
+      border-bottom: 1px solid #e1e4e8;
+      padding: 20px 30px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .post-composer {
+      background-color: #f6f8fa;
+      border: 1px solid #e1e4e8;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 30px;
+    }
+
+    .post-composer textarea {
+      width: 100%;
+      border: 1px solid #e1e4e8;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 14px;
+      background-color: white;
+      color: #24292e;
+      resize: vertical;
+    }
+
+    .post-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .post-actions button {
+      background-color: #0366d6;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .post-actions button:hover {
+      background-color: #0256c7;
+    }
+
+    .feed {
+      padding: 0 30px 30px 30px;
+    }
+
+    .post {
+      background-color: white;
+      border: 1px solid #e1e4e8;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 15px 0;
+    }
+
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+
+    .post-author {
+      flex: 1;
+    }
+
+    .post-author-name {
+      font-weight: 600;
+      color: #24292e;
+    }
+
+    .post-time {
+      color: #586069;
+      font-size: 14px;
+    }
+
+    .post-content {
+      color: #24292e;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    .post-image {
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      border-radius: 8px;
+      margin: 12px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .post-actions-bar {
+      display: flex;
+      gap: 20px;
+      padding-top: 12px;
+      border-top: 1px solid #e1e4e8;
+    }
+
+    .post-action {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #586069;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background-color: transparent;
+      border: none;
+      font-size: 14px;
+    }
+
+    .post-action:hover {
+      background-color: #f6f8fa;
+    }
+
+    /* Right sidebar */
+    .right-sidebar {
+      width: 300px;
+      background-color: #f6f8fa;
+      border-left: 1px solid #e1e4e8;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .widget {
+      background-color: white;
+      border: 1px solid #e1e4e8;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .widget-title {
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #24292e;
+    }
+
+    .widget-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #e1e4e8;
+    }
+
+    .widget-item:last-child {
+      border-bottom: none;
+    }
+
+    .trend-tag {
+      color: #0366d6;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .trend-count {
+      color: #586069;
+      font-size: 13px;
+    }
+
+    /* Code block */
+    .code-block {
+      background-color: #f6f8fa;
+      border: 1px solid #e1e4e8;
+      border-radius: 6px;
+      padding: 16px;
+      margin: 12px 0;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      overflow-x: auto;
+    }
+
+    .code-block code {
+      color: #24292e;
+    }
+
+    /* Nested comments */
+    .comments {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e1e4e8;
+    }
+
+    .comment {
+      display: flex;
+      gap: 12px;
+      margin: 15px 0;
+      padding-left: 0;
+    }
+
+    .comment.nested {
+      padding-left: 60px;
+    }
+
+    .comment-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      flex-shrink: 0;
+    }
+
+    .comment-body {
+      flex: 1;
+      background-color: #f6f8fa;
+      border: 1px solid #e1e4e8;
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .comment-author {
+      font-weight: 600;
+      color: #24292e;
+      margin-bottom: 6px;
+    }
+
+    .comment-text {
+      color: #24292e;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <h1 style="font-size: 20px;">ComplexSite</h1>
+      <nav class="header-nav">
+        <a href="#home">Home</a>
+        <a href="#explore">Explore</a>
+        <a href="#notifications">Notifications</a>
+      </nav>
+    </div>
+    <input type="search" class="header-search" placeholder="Search...">
+    <div style="display: flex; gap: 15px; align-items: center;">
+      <button
+        style="background: transparent; border: 1px solid white; color: white; padding: 6px 16px; border-radius: 6px; cursor: pointer;">Sign
+        In</button>
+      <div class="avatar" style="width: 32px; height: 32px; font-size: 14px;">U</div>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside class="sidebar">
+      <h3 style="margin-bottom: 15px; color: #24292e;">Navigation</h3>
+      <div class="sidebar-item active">
+        <span>📥</span>
+        <span>Inbox</span>
+        <span class="badge">12</span>
+      </div>
+      <div class="sidebar-item">
+        <span>⭐</span>
+        <span>Starred</span>
+      </div>
+      <div class="sidebar-item">
+        <span>📤</span>
+        <span>Sent</span>
+      </div>
+      <div class="sidebar-item">
+        <span>📝</span>
+        <span>Drafts</span>
+        <span class="badge">3</span>
+      </div>
+      <div class="sidebar-item">
+        <span>🗑️</span>
+        <span>Trash</span>
+      </div>
+
+      <h3 style="margin: 25px 0 15px 0; color: #24292e;">Labels</h3>
+      <div class="sidebar-item">
+        <span style="width: 12px; height: 12px; background-color: #0366d6; border-radius: 50%;"></span>
+        <span>Work</span>
+      </div>
+      <div class="sidebar-item">
+        <span style="width: 12px; height: 12px; background-color: #28a745; border-radius: 50%;"></span>
+        <span>Personal</span>
+      </div>
+      <div class="sidebar-item">
+        <span style="width: 12px; height: 12px; background-color: #ffc107; border-radius: 50%;"></span>
+        <span>Important</span>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="content-header">
+        <h2>Complex Layout Test</h2>
+        <p style="color: #586069; margin-top: 5px;">Testing dark theme on layouts similar to Gmail, Twitter, and GitHub
+        </p>
+      </div>
+
+      <div class="post-composer">
+        <textarea rows="3" placeholder="What's on your mind?"></textarea>
+        <div class="post-actions">
+          <div style="display: flex; gap: 10px;">
+            <button style="background-color: transparent; color: #586069; border: 1px solid #e1e4e8;">📷 Photo</button>
+            <button style="background-color: transparent; color: #586069; border: 1px solid #e1e4e8;">🎥 Video</button>
+          </div>
+          <button>Post</button>
+        </div>
+      </div>
+
+      <div class="feed">
+        <div class="post">
+          <div class="post-header">
+            <div class="avatar">JD</div>
+            <div class="post-author">
+              <div class="post-author-name">John Doe</div>
+              <div class="post-time">2 hours ago</div>
+            </div>
+          </div>
+          <div class="post-content">
+            <p>Testing the dark theme extension on a complex layout! This post includes text, images, and code blocks.
+            </p>
+            <p style="margin-top: 10px;">Here's a code snippet:</p>
+            <div class="code-block">
+              <code>
+function applyDarkTheme(intensity) {<br>
+&nbsp;&nbsp;document.documentElement.classList.add('dark-theme-active');<br>
+&nbsp;&nbsp;document.documentElement.style.setProperty('--dark-theme-intensity', intensity / 100);<br>
+}
+                            </code>
+            </div>
+          </div>
+          <div class="post-image">Sample Image Content</div>
+          <div class="post-actions-bar">
+            <button class="post-action">👍 Like (24)</button>
+            <button class="post-action">💬 Comment (5)</button>
+            <button class="post-action">🔄 Share</button>
+          </div>
+
+          <div class="comments">
+            <div class="comment">
+              <div class="comment-avatar"></div>
+              <div class="comment-body">
+                <div class="comment-author">Jane Smith</div>
+                <div class="comment-text">Great work! The dark theme looks amazing.</div>
+              </div>
+            </div>
+            <div class="comment nested">
+              <div class="comment-avatar" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
+              <div class="comment-body">
+                <div class="comment-author">John Doe</div>
+                <div class="comment-text">Thanks! Nested comments should also work well with the theme.</div>
+              </div>
+            </div>
+            <div class="comment">
+              <div class="comment-avatar" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"></div>
+              <div class="comment-body">
+                <div class="comment-author">Bob Johnson</div>
+                <div class="comment-text">Testing with a longer comment to see how the dark theme handles multi-line
+                  text in nested components. The readability should remain excellent even with extended content.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="post">
+          <div class="post-header">
+            <div class="avatar" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">AS</div>
+            <div class="post-author">
+              <div class="post-author-name">Alice Smith</div>
+              <div class="post-time">5 hours ago</div>
+            </div>
+          </div>
+          <div class="post-content">
+            <p>Another post to test consistency across multiple feed items. The dark theme should apply uniformly to all
+              posts.</p>
+            <ul style="margin: 10px 0 10px 20px;">
+              <li>List item one</li>
+              <li>List item two with <a href="#" style="color: #0366d6;">a link</a></li>
+              <li>List item three</li>
+            </ul>
+          </div>
+          <div class="post-actions-bar">
+            <button class="post-action">👍 Like (15)</button>
+            <button class="post-action">💬 Comment (2)</button>
+            <button class="post-action">🔄 Share</button>
+          </div>
+        </div>
+
+        <div class="post">
+          <div class="post-header">
+            <div class="avatar" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">MJ</div>
+            <div class="post-author">
+              <div class="post-author-name">Mike Johnson</div>
+              <div class="post-time">1 day ago</div>
+            </div>
+          </div>
+          <div class="post-content">
+            <p>Testing with various inline styles and nested elements:</p>
+            <div
+              style="background-color: #fff3cd; border: 1px solid #ffc107; padding: 12px; border-radius: 6px; margin: 10px 0;">
+              <strong>Warning:</strong> This is a custom styled alert box that should also adapt to dark theme.
+            </div>
+            <div
+              style="background-color: #d1ecf1; border: 1px solid #0dcaf0; padding: 12px; border-radius: 6px; margin: 10px 0;">
+              <strong>Info:</strong> Multiple colored boxes to test theme application.
+            </div>
+          </div>
+          <div class="post-actions-bar">
+            <button class="post-action">👍 Like (8)</button>
+            <button class="post-action">💬 Comment (1)</button>
+            <button class="post-action">🔄 Share</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="right-sidebar">
+      <div class="widget">
+        <div class="widget-title">Trending Topics</div>
+        <div class="widget-item">
+          <div class="trend-tag">#DarkTheme</div>
+          <div class="trend-count">1.2K posts</div>
+        </div>
+        <div class="widget-item">
+          <div class="trend-tag">#WebDevelopment</div>
+          <div class="trend-count">856 posts</div>
+        </div>
+        <div class="widget-item">
+          <div class="trend-tag">#ChromeExtension</div>
+          <div class="trend-count">432 posts</div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-title">Suggestions</div>
+        <div class="widget-item">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="avatar"
+              style="width: 32px; height: 32px; font-size: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+              SU</div>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; font-size: 14px;">Suggested User</div>
+              <div style="color: #586069; font-size: 12px;">@suggesteduser</div>
+            </div>
+            <button
+              style="background-color: #0366d6; color: white; border: none; padding: 4px 12px; border-radius: 4px; font-size: 12px; cursor: pointer;">Follow</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-title">Quick Stats</div>
+        <div class="widget-item">
+          <div style="display: flex; justify-content: space-between;">
+            <span>Posts</span>
+            <strong>234</strong>
+          </div>
+        </div>
+        <div class="widget-item">
+          <div style="display: flex; justify-content: space-between;">
+            <span>Followers</span>
+            <strong>1.2K</strong>
+          </div>
+        </div>
+        <div class="widget-item">
+          <div style="display: flex; justify-content: space-between;">
+            <span>Following</span>
+            <strong>456</strong>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    console.log('Complex layout test page loaded');
+    console.log('This page simulates complex layouts from:');
+    console.log('- Gmail (sidebar navigation)');
+    console.log('- Twitter (feed with posts and comments)');
+    console.log('- GitHub (header and code blocks)');
+    console.log('');
+    console.log('Test checklist:');
+    console.log('✓ Header with dark background');
+    console.log('✓ Multiple sidebars');
+    console.log('✓ Feed with cards');
+    console.log('✓ Nested comments');
+    console.log('✓ Code blocks');
+    console.log('✓ Images/media placeholders');
+    console.log('✓ Inline styled elements');
+    console.log('✓ Various button styles');
+    console.log('✓ Form inputs');
+  </script>
+</body>
+
+</html>

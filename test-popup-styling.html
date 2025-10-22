@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Popup Styling Test</title>
+  <link rel="stylesheet" href="src/popup/popup.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f0f0f0;
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <div class="header">
+      <h1 class="header-title">Dark Theme Extension</h1>
+      <p class="header-subtitle">Apply customizable dark themes to any website</p>
+    </div>
+
+    <!-- Success Alert -->
+    <div class="alert alert-success">
+      Dark theme enabled successfully!
+    </div>
+
+    <!-- Theme Toggle -->
+    <div class="theme-toggle-container">
+      <div class="theme-toggle-row">
+        <label class="theme-toggle-label">Dark Theme</label>
+        <button class="toggle-switch active">
+          <span class="toggle-knob"></span>
+        </button>
+      </div>
+      <p class="theme-toggle-status">Dark theme is enabled</p>
+    </div>
+
+    <!-- Intensity Slider -->
+    <div class="intensity-slider-container">
+      <div class="intensity-slider-header">
+        <label class="intensity-slider-label">Intensity</label>
+        <span class="intensity-value">80%</span>
+      </div>
+      <input type="range" min="0" max="100" value="80" class="intensity-slider">
+      <div class="intensity-slider-labels">
+        <span class="intensity-slider-label-text">Subtle</span>
+        <span class="intensity-slider-label-text">Maximum</span>
+      </div>
+    </div>
+
+    <!-- Current Site Info -->
+    <div class="current-site-info">
+      <div class="site-info-header">
+        <span class="site-info-label">Current Site</span>
+      </div>
+      <div class="site-info-main">
+        <span class="site-hostname">example.com</span>
+        <div class="site-status-badge active">
+          <span class="status-indicator-dot active"></span>
+          <span class="status-badge-text active">ON</span>
+        </div>
+      </div>
+      <div class="site-info-details">
+        <div class="site-info-item">
+          <span class="site-info-item-label">Status: </span>
+          <span class="site-info-item-value active">Active</span>
+        </div>
+        <div class="site-info-item">
+          <span class="site-info-item-label">Intensity: </span>
+          <span class="site-info-item-value">80%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Site List Manager -->
+    <div class="site-list-manager">
+      <h2 class="site-list-manager-title">Site Management</h2>
+
+      <!-- Whitelist -->
+      <div class="site-list">
+        <div class="site-list-header">
+          <h3 class="site-list-title whitelist">Whitelist</h3>
+          <p class="site-list-description">Sites that always get dark theme</p>
+        </div>
+        <div class="site-list-input-row">
+          <input type="text" placeholder="example.com" class="site-list-input">
+          <button class="site-list-add-button whitelist">Add</button>
+        </div>
+        <div class="site-list-items">
+          <div class="site-list-item current">
+            <span class="site-list-item-text">
+              example.com
+              <span class="site-list-item-current-badge">(current)</span>
+            </span>
+            <button class="site-list-remove-button">Remove</button>
+          </div>
+          <div class="site-list-item">
+            <span class="site-list-item-text">github.com</span>
+            <button class="site-list-remove-button">Remove</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blacklist -->
+      <div class="site-list">
+        <div class="site-list-header">
+          <h3 class="site-list-title blacklist">Blacklist</h3>
+          <p class="site-list-description">Sites that never get dark theme</p>
+        </div>
+        <div class="site-list-input-row">
+          <input type="text" placeholder="example.com" class="site-list-input">
+          <button class="site-list-add-button blacklist">Add</button>
+        </div>
+        <p class="site-list-empty">No sites in blacklist</p>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

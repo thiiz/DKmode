@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings Persistence on Page Load Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .test-container {
+      background: white;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #333;
+      border-bottom: 3px solid #4CAF50;
+      padding-bottom: 10px;
+    }
+
+    h2 {
+      color: #555;
+      margin-top: 30px;
+    }
+
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f9f9f9;
+      border-left: 4px solid #2196F3;
+    }
+
+    .test-result {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    .test-result.pass {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+
+    .test-result.fail {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+
+    .test-result.info {
+      background: #d1ecf1;
+      border: 1px solid #bee5eb;
+      color: #0c5460;
+    }
+
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    button.secondary {
+      background: #2196F3;
+    }
+
+    button.secondary:hover {
+      background: #0b7dda;
+    }
+
+    button.danger {
+      background: #f44336;
+    }
+
+    button.danger:hover {
+      background: #da190b;
+    }
+
+    .control-panel {
+      background: #fff3cd;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+      border: 1px solid #ffc107;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+    .status-indicator.active {
+      background: #4CAF50;
+    }
+
+    .status-indicator.inactive {
+      background: #f44336;
+    }
+
+    .current-state {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 15px 0;
+    }
+
+    .settings-display {
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    input[type="number"] {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 100px;
+      margin: 0 10px;
+    }
+
+    input[type="text"] {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 300px;
+      margin: 0 10px;
+    }
+
+    .test-content {
+      margin: 20px 0;
+      padding: 20px;
+      background: white;
+      border: 2px solid #ddd;
+    }
+
+    .test-content p {
+      line-height: 1.6;
+    }
+
+    .test-content a {
+      color: #2196F3;
+      text-decoration: none;
+    }
+
+    .test-content a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🧪 Settings Persistence on Page Load Test</h1>
+
+  <div class="test-container">
+    <h2>Test Overview</h2>
+    <p>This page tests that the Dark Theme Extension correctly retrieves and applies settings when a page loads.</p>
+    <p><strong>Task 21 Requirements:</strong></p>
+    <ul>
+      <li>✓ Verify content script retrieves settings from chrome.storage.sync on load</li>
+      <li>✓ Test that dark theme applies automatically when page loads if enabled</li>
+      <li>✓ Verify intensity level is applied from saved settings</li>
+      <li>✓ Test whitelist/blacklist logic on page load</li>
+    </ul>
+  </div>
+
+  <div class="current-state">
+    <h3>Current Page State</h3>
+    <div id="currentState">
+      <p><span class="status-indicator" id="themeStatus"></span><strong>Dark Theme:</strong> <span
+          id="themeActive">Checking...</span></p>
+      <p><strong>Intensity:</strong> <span id="currentIntensity">N/A</span></p>
+      <p><strong>Current Hostname:</strong> <code id="currentHostname">N/A</code></p>
+    </div>
+  </div>
+
+  <div class="control-panel">
+    <h3>⚙️ Test Controls</h3>
+    <p>Use these controls to set up different test scenarios. After changing settings, reload the page to test
+      persistence.</p>
+
+    <div style="margin: 15px 0;">
+      <button onclick="setGlobalEnabled(true)">Enable Global Dark Theme</button>
+      <button onclick="setGlobalEnabled(false)" class="danger">Disable Global Dark Theme</button>
+    </div>
+
+    <div style="margin: 15px 0;">
+      <label>Set Intensity:</label>
+      <input type="number" id="intensityInput" min="0" max="100" value="80">
+      <button onclick="setIntensity()" class="secondary">Apply Intensity</button>
+    </div>
+
+    <div style="margin: 15px 0;">
+      <label>Add to Whitelist:</label>
+      <input type="text" id="whitelistInput" placeholder="example.com">
+      <button onclick="addToWhitelist()" class="secondary">Add</button>
+      <button onclick="clearWhitelist()" class="danger">Clear Whitelist</button>
+    </div>
+
+    <div style="margin: 15px 0;">
+      <label>Add to Blacklist:</label>
+      <input type="text" id="blacklistInput" placeholder="example.com">
+      <button onclick="addToBlacklist()" class="secondary">Add</button>
+      <button onclick="clearBlacklist()" class="danger">Clear Blacklist</button>
+    </div>
+
+    <div style="margin: 15px 0;">
+      <button onclick="clearAllSettings()" class="danger">Clear All Settings</button>
+      <button onclick="location.reload()" class="secondary">Reload Page</button>
+    </div>
+  </div>
+
+  <div class="test-container">
+    <h3>📊 Current Settings in Storage</h3>
+    <button onclick="displayCurrentSettings()">Refresh Settings Display</button>
+    <div class="settings-display" id="settingsDisplay">Click "Refresh Settings Display" to view current settings...
+    </div>
+  </div>
+
+  <div class="test-container">
+    <h2>🧪 Automated Tests</h2>
+    <button onclick="runAllTests()">Run All Tests</button>
+    <button onclick="clearTestResults()">Clear Results</button>
+    <div id="testResults"></div>
+  </div>
+
+  <div class="test-content">
+    <h2>Sample Content for Visual Testing</h2>
+    <p>This is sample text content to test the dark theme appearance. The text should be readable and have appropriate
+      contrast.</p>
+    <p>Here's a <a href="#">sample link</a> to test link styling in dark mode.</p>
+    <button>Sample Button</button>
+    <input type="text" placeholder="Sample input field">
+    <textarea placeholder="Sample textarea"></textarea>
+  </div>
+
+  <script>
+    // Check current theme state
+    function updateCurrentState() {
+      const isDarkThemeActive = document.documentElement.classList.contains('dark-theme-active');
+      const intensity = document.documentElement.style.getPropertyValue('--dark-theme-intensity');
+      const hostname = window.location.hostname;
+
+      document.getElementById('themeActive').textContent = isDarkThemeActive ? 'Active' : 'Inactive';
+      document.getElementById('themeStatus').className = 'status-indicator ' + (isDarkThemeActive ? 'active' : 'inactive');
+      document.getElementById('currentIntensity').textContent = intensity ? `${Math.round(intensity * 100)}%` : 'N/A';
+      document.getElementById('currentHostname').textContent = hostname;
+    }
+
+    // Display current settings from storage
+    async function displayCurrentSettings() {
+      try {
+        const settings = await chrome.storage.sync.get([
+          'darkThemeEnabled',
+          'intensity',
+          'whitelist',
+          'blacklist',
+          'siteSettings'
+        ]);
+
+        document.getElementById('settingsDisplay').textContent = JSON.stringify(settings, null, 2);
+      } catch (error) {
+        document.getElementById('settingsDisplay').textContent = 'Error: ' + error.message;
+      }
+    }
+
+    // Set global dark theme enabled state
+    async function setGlobalEnabled(enabled) {
+      try {
+        await chrome.storage.sync.set({ darkThemeEnabled: enabled });
+        addTestResult(`Global dark theme ${enabled ? 'enabled' : 'disabled'}`, 'info');
+        displayCurrentSettings();
+      } catch (error) {
+        addTestResult('Error setting global state: ' + error.message, 'fail');
+      }
+    }
+
+    // Set intensity
+    async function setIntensity() {
+      try {
+        const intensity = parseInt(document.getElementById('intensityInput').value);
+        if (intensity < 0 || intensity > 100) {
+          addTestResult('Intensity must be between 0 and 100', 'fail');
+          return;
+        }
+        await chrome.storage.sync.set({ intensity });
+        addTestResult(`Intensity set to ${intensity}%`, 'info');
+        displayCurrentSettings();
+      } catch (error) {
+        addTestResult('Error setting intensity: ' + error.message, 'fail');
+      }
+    }
+
+    // Add to whitelist
+    async function addToWhitelist() {
+      try {
+        const site = document.getElementById('whitelistInput').value.trim();
+        if (!site) {
+          addTestResult('Please enter a site to whitelist', 'fail');
+          return;
+        }
+
+        const { whitelist = [] } = await chrome.storage.sync.get(['whitelist']);
+        if (!whitelist.includes(site)) {
+          whitelist.push(site);
+          await chrome.storage.sync.set({ whitelist });
+          addTestResult(`Added ${site} to whitelist`, 'info');
+          document.getElementById('whitelistInput').value = '';
+          displayCurrentSettings();
+        } else {
+          addTestResult(`${site} is already in whitelist`, 'info');
+        }
+      } catch (error) {
+        addTestResult('Error adding to whitelist: ' + error.message, 'fail');
+      }
+    }
+
+    // Add to blacklist
+    async function addToBlacklist() {
+      try {
+        const site = document.getElementById('blacklistInput').value.trim();
+        if (!site) {
+          addTestResult('Please enter a site to blacklist', 'fail');
+          return;
+        }
+
+        const { blacklist = [] } = await chrome.storage.sync.get(['blacklist']);
+        if (!blacklist.includes(site)) {
+          blacklist.push(site);
+          await chrome.storage.sync.set({ blacklist });
+          addTestResult(`Added ${site} to blacklist`, 'info');
+          document.getElementById('blacklistInput').value = '';
+          displayCurrentSettings();
+        } else {
+          addTestResult(`${site} is already in blacklist`, 'info');
+        }
+      } catch (error) {
+        addTestResult('Error adding to blacklist: ' + error.message, 'fail');
+      }
+    }
+
+    // Clear whitelist
+    async function clearWhitelist() {
+      try {
+        await chrome.storage.sync.set({ whitelist: [] });
+        addTestResult('Whitelist cleared', 'info');
+        displayCurrentSettings();
+      } catch (error) {
+        addTestResult('Error clearing whitelist: ' + error.message, 'fail');
+      }
+    }
+
+    // Clear blacklist
+    async function clearBlacklist() {
+      try {
+        await chrome.storage.sync.set({ blacklist: [] });
+        addTestResult('Blacklist cleared', 'info');
+        displayCurrentSettings();
+      } catch (error) {
+        addTestResult('Error clearing blacklist: ' + error.message, 'fail');
+      }
+    }
+
+    // Clear all settings
+    async function clearAllSettings() {
+      try {
+        await chrome.storage.sync.clear();
+        addTestResult('All settings cleared', 'info');
+        displayCurrentSettings();
+      } catch (error) {
+        addTestResult('Error clearing settings: ' + error.message, 'fail');
+      }
+    }
+
+    // Add test result to display
+    function addTestResult(message, type = 'info') {
+      const resultsDiv = document.getElementById('testResults');
+      const resultDiv = document.createElement('div');
+      resultDiv.className = `test-result ${type}`;
+      resultDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      resultsDiv.appendChild(resultDiv);
+      resultsDiv.scrollTop = resultsDiv.scrollHeight;
+    }
+
+    // Clear test results
+    function clearTestResults() {
+      document.getElementById('testResults').innerHTML = '';
+    }
+
+    // Run all automated tests
+    async function runAllTests() {
+      clearTestResults();
+      addTestResult('Starting automated tests...', 'info');
+
+      // Test 1: Verify settings retrieval
+      addTestResult('Test 1: Verifying settings retrieval from chrome.storage.sync', 'info');
+      try {
+        const settings = await chrome.storage.sync.get([
+          'darkThemeEnabled',
+          'intensity',
+          'whitelist',
+          'blacklist',
+          'siteSettings'
+        ]);
+
+        if (settings !== null && typeof settings === 'object') {
+          addTestResult('✓ Settings successfully retrieved from storage', 'pass');
+          addTestResult(`  - darkThemeEnabled: ${settings.darkThemeEnabled}`, 'info');
+          addTestResult(`  - intensity: ${settings.intensity}`, 'info');
+          addTestResult(`  - whitelist: ${JSON.stringify(settings.whitelist || [])}`, 'info');
+          addTestResult(`  - blacklist: ${JSON.stringify(settings.blacklist || [])}`, 'info');
+        } else {
+          addTestResult('✗ Failed to retrieve settings', 'fail');
+        }
+      } catch (error) {
+        addTestResult('✗ Error retrieving settings: ' + error.message, 'fail');
+      }
+
+      // Test 2: Verify dark theme application
+      addTestResult('Test 2: Verifying dark theme application on page load', 'info');
+      const isDarkThemeActive = document.documentElement.classList.contains('dark-theme-active');
+      const settings = await chrome.storage.sync.get(['darkThemeEnabled', 'whitelist', 'blacklist']);
+      const currentHostname = window.location.hostname;
+
+      let shouldBeActive = false;
+      if (settings.blacklist && settings.blacklist.includes(currentHostname)) {
+        shouldBeActive = false;
+        addTestResult(`  - Current site is blacklisted, theme should be inactive`, 'info');
+      } else if (settings.whitelist && settings.whitelist.includes(currentHostname)) {
+        shouldBeActive = true;
+        addTestResult(`  - Current site is whitelisted, theme should be active`, 'info');
+      } else {
+        shouldBeActive = settings.darkThemeEnabled || false;
+        addTestResult(`  - Using global setting: ${shouldBeActive}`, 'info');
+      }
+
+      if (isDarkThemeActive === shouldBeActive) {
+        addTestResult(`✓ Dark theme state is correct (${isDarkThemeActive ? 'active' : 'inactive'})`, 'pass');
+      } else {
+        addTestResult(`✗ Dark theme state mismatch. Expected: ${shouldBeActive}, Actual: ${isDarkThemeActive}`, 'fail');
+      }
+
+      // Test 3: Verify intensity application
+      addTestResult('Test 3: Verifying intensity level from saved settings', 'info');
+      const intensityValue = document.documentElement.style.getPropertyValue('--dark-theme-intensity');
+      const savedIntensity = settings.intensity || 80;
+
+      if (isDarkThemeActive) {
+        if (intensityValue) {
+          const appliedIntensity = Math.round(parseFloat(intensityValue) * 100);
+          addTestResult(`  - Applied intensity: ${appliedIntensity}%`, 'info');
+          addTestResult(`  - Saved intensity: ${savedIntensity}%`, 'info');
+
+          if (Math.abs(appliedIntensity - savedIntensity) <= 1) {
+            addTestResult('✓ Intensity correctly applied from saved settings', 'pass');
+          } else {
+            addTestResult(`✗ Intensity mismatch. Expected: ${savedIntensity}%, Applied: ${appliedIntensity}%`, 'fail');
+          }
+        } else {
+          addTestResult('✗ Intensity CSS variable not set', 'fail');
+        }
+      } else {
+        addTestResult('  - Dark theme inactive, skipping intensity check', 'info');
+      }
+
+      // Test 4: Verify whitelist/blacklist logic
+      addTestResult('Test 4: Testing whitelist/blacklist logic', 'info');
+      const { whitelist = [], blacklist = [] } = settings;
+
+      addTestResult(`  - Current hostname: ${currentHostname}`, 'info');
+      addTestResult(`  - Whitelist: ${JSON.stringify(whitelist)}`, 'info');
+      addTestResult(`  - Blacklist: ${JSON.stringify(blacklist)}`, 'info');
+
+      if (blacklist.includes(currentHostname)) {
+        if (!isDarkThemeActive) {
+          addTestResult('✓ Blacklist logic working correctly (theme inactive)', 'pass');
+        } else {
+          addTestResult('✗ Blacklist not working (theme should be inactive)', 'fail');
+        }
+      } else if (whitelist.includes(currentHostname)) {
+        if (isDarkThemeActive) {
+          addTestResult('✓ Whitelist logic working correctly (theme active)', 'pass');
+        } else {
+          addTestResult('✗ Whitelist not working (theme should be active)', 'fail');
+        }
+      } else {
+        addTestResult('✓ Site not in whitelist or blacklist, using global setting', 'pass');
+      }
+
+      addTestResult('All tests completed!', 'info');
+    }
+
+    // Initialize on page load
+    window.addEventListener('load', () => {
+      updateCurrentState();
+      displayCurrentSettings();
+
+      // Update state every second to catch changes
+      setInterval(updateCurrentState, 1000);
+    });
+  </script>
+</body>
+
+</html>

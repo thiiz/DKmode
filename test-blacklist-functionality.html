@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blacklist Functionality Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .test-section {
+      background: white;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    h2 {
+      color: #666;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 10px;
+    }
+
+    .test-case {
+      margin: 15px 0;
+      padding: 15px;
+      background: #f8f9fa;
+      border-left: 4px solid #007bff;
+    }
+
+    .test-case h3 {
+      margin-top: 0;
+      color: #007bff;
+    }
+
+    .expected {
+      color: #28a745;
+      font-weight: bold;
+    }
+
+    .steps {
+      margin: 10px 0;
+    }
+
+    .steps li {
+      margin: 5px 0;
+    }
+
+    code {
+      background: #e9ecef;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🚫 Blacklist Functionality Test Page</h1>
+
+  <div class="test-section">
+    <h2>Test Overview</h2>
+    <p>This page tests the blacklist functionality of the Dark Theme Extension. The blacklist allows users to prevent
+      dark theme from being applied to specific sites.</p>
+    <p><strong>Current URL:</strong> <code id="current-url"></code></p>
+  </div>
+
+  <div class="test-section">
+    <h2>Test Cases</h2>
+
+    <div class="test-case">
+      <h3>Test 1: Add Current Site to Blacklist</h3>
+      <div class="steps">
+        <ol>
+          <li>Open the extension popup</li>
+          <li>Ensure dark theme is enabled globally (toggle ON)</li>
+          <li>Verify dark theme is applied to this page</li>
+          <li>In the "Blacklist" section, click "Add Current Site"</li>
+          <li>Observe the site is added to the blacklist</li>
+        </ol>
+      </div>
+      <p class="expected">Expected: Dark theme should be immediately removed from this page, even though it's enabled
+        globally</p>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 2: Add Custom Site to Blacklist</h3>
+      <div class="steps">
+        <ol>
+          <li>Open the extension popup</li>
+          <li>In the "Blacklist" section, type a domain (e.g., "example.com")</li>
+          <li>Click "Add to Blacklist"</li>
+          <li>Verify the site appears in the blacklist</li>
+          <li>Navigate to that site</li>
+        </ol>
+      </div>
+      <p class="expected">Expected: Dark theme should never be applied to the blacklisted site, regardless of global
+        settings</p>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 3: Remove Site from Blacklist</h3>
+      <div class="steps">
+        <ol>
+          <li>With this site in the blacklist and dark theme enabled globally</li>
+          <li>Open the extension popup</li>
+          <li>Find this site in the blacklist</li>
+          <li>Click the "Remove" button next to it</li>
+        </ol>
+      </div>
+      <p class="expected">Expected: Dark theme should be immediately applied to this page (if global setting is ON)</p>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 4: Blacklist Overrides Whitelist</h3>
+      <div class="steps">
+        <ol>
+          <li>Add this site to the whitelist</li>
+          <li>Verify dark theme is applied</li>
+          <li>Now add this site to the blacklist</li>
+        </ol>
+      </div>
+      <p class="expected">Expected: Dark theme should be removed. Blacklist takes priority over whitelist</p>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 5: Blacklist Persistence</h3>
+      <div class="steps">
+        <ol>
+          <li>Add several sites to the blacklist</li>
+          <li>Close the popup</li>
+          <li>Reopen the popup</li>
+          <li>Verify all blacklisted sites are still there</li>
+          <li>Close and reopen the browser</li>
+          <li>Check the blacklist again</li>
+        </ol>
+      </div>
+      <p class="expected">Expected: Blacklist should persist across popup closes and browser restarts</p>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 6: Storage Sync Verification</h3>
+      <div class="steps">
+        <ol>
+          <li>Add sites to the blacklist</li>
+          <li>Open Chrome DevTools</li>
+          <li>Go to Application → Storage → Extension Storage</li>
+          <li>Check the <code>blacklist</code> key</li>
+        </ol>
+      </div>
+      <p class="expected">Expected: The blacklist array should be stored in chrome.storage.sync with all added sites</p>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 7: Error Handling</h3>
+      <div class="steps">
+        <ol>
+          <li>Try adding an invalid domain (e.g., "not a domain!")</li>
+          <li>Try adding a duplicate site that's already blacklisted</li>
+          <li>Try removing a site that doesn't exist</li>
+        </ol>
+      </div>
+      <p class="expected">Expected: Appropriate error messages or validation should prevent invalid operations</p>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 8: Success Messages</h3>
+      <div class="steps">
+        <ol>
+          <li>Add the current site to blacklist</li>
+          <li>Observe the success message</li>
+          <li>Remove the current site from blacklist</li>
+          <li>Observe the success message</li>
+        </ol>
+      </div>
+      <p class="expected">Expected: Clear success messages like "example.com added to blacklist and dark theme removed"
+        and "example.com removed from blacklist and dark theme applied"</p>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>Visual Test Elements</h2>
+    <p>These elements help verify the dark theme is being applied or removed correctly:</p>
+
+    <div style="padding: 20px; margin: 10px 0; background: white; border: 2px solid #ddd;">
+      <h3>Sample Content</h3>
+      <p>This is regular paragraph text. When dark theme is active, this should have light text on a dark background.
+      </p>
+      <input type="text" placeholder="Input field" style="margin: 10px 0; padding: 8px;">
+      <button style="padding: 8px 16px; margin: 10px 0;">Sample Button</button>
+      <a href="#" style="display: block; margin: 10px 0;">Sample Link</a>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>Implementation Verification</h2>
+    <p>The following features should be implemented in <code>src/popup/App.jsx</code>:</p>
+    <ul>
+      <li>✅ <code>handleBlacklistChange()</code> function that handles both add and remove operations</li>
+      <li>✅ Updates blacklist array in state</li>
+      <li>✅ Saves blacklist to chrome.storage.sync</li>
+      <li>✅ Sends message to content script to remove theme when site is blacklisted</li>
+      <li>✅ Sends message to content script to apply theme when site is removed from blacklist (if conditions met)</li>
+      <li>✅ Displays success messages for blacklist operations</li>
+      <li>✅ Error handling with user-friendly messages</li>
+      <li>✅ Reverts state on error</li>
+    </ul>
+  </div>
+
+  <script>
+    // Display current URL
+    document.getElementById('current-url').textContent = window.location.hostname;
+  </script>
+</body>
+
+</html>

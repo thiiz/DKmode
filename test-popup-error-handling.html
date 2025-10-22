@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Popup Error Handling</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    h1 {
+      color: #333;
+      border-bottom: 3px solid #4CAF50;
+      padding-bottom: 10px;
+    }
+
+    h2 {
+      color: #4CAF50;
+      margin-top: 30px;
+    }
+
+    .test-section {
+      background: white;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .test-case {
+      margin: 15px 0;
+      padding: 15px;
+      background: #f9f9f9;
+      border-left: 4px solid #4CAF50;
+      border-radius: 4px;
+    }
+
+    .test-case h3 {
+      margin-top: 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .test-steps {
+      margin: 10px 0;
+    }
+
+    .test-steps li {
+      margin: 8px 0;
+      line-height: 1.6;
+    }
+
+    .expected {
+      background: #e8f5e9;
+      padding: 10px;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    .expected strong {
+      color: #2e7d32;
+    }
+
+    .code {
+      background: #263238;
+      color: #aed581;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+
+    .warning {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
+
+    .info {
+      background: #e3f2fd;
+      border-left: 4px solid #2196F3;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+    }
+
+    .checklist {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .checklist li {
+      padding: 8px;
+      margin: 5px 0;
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+    }
+
+    .checklist li:before {
+      content: "☐ ";
+      color: #4CAF50;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    .implementation {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 15px 0;
+    }
+
+    .implementation h4 {
+      margin-top: 0;
+      color: #666;
+    }
+
+    .implementation ul {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🛡️ Task 18: Popup Error Handling Test Guide</h1>
+
+  <div class="info">
+    <strong>📋 Test Objective:</strong> Verify that all error handling in the popup works correctly and provides
+    user-friendly feedback for various failure scenarios.
+  </div>
+
+  <div class="test-section">
+    <h2>🔧 Setup Instructions</h2>
+    <ol>
+      <li>Build the extension: <span class="code">npm run build</span></li>
+      <li>Load the extension in Chrome from the <span class="code">dist</span> folder</li>
+      <li>Open Chrome DevTools Console to monitor error logs</li>
+      <li>Keep this test guide open for reference</li>
+    </ol>
+  </div>
+
+  <div class="test-section">
+    <h2>🧪 Test Cases</h2>
+
+    <div class="test-case">
+      <h3>Test 1: Restricted Page Detection</h3>
+      <div class="test-steps">
+        <strong>Steps:</strong>
+        <ol>
+          <li>Navigate to <span class="code">chrome://extensions</span></li>
+          <li>Click the extension icon to open the popup</li>
+          <li>Observe the current site display and any error messages</li>
+        </ol>
+      </div>
+      <div class="expected">
+        <strong>Expected Result:</strong>
+        <ul>
+          <li>Current site shows "Restricted Page"</li>
+          <li>Error message displayed: "This extension cannot run on browser pages. Try a regular website."</li>
+          <li>Error message is styled with red background</li>
+          <li>No console errors thrown</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 2: Theme Toggle on Restricted Page</h3>
+      <div class="test-steps">
+        <strong>Steps:</strong>
+        <ol>
+          <li>Stay on <span class="code">chrome://extensions</span></li>
+          <li>Try to toggle the dark theme switch</li>
+          <li>Observe the error message</li>
+        </ol>
+      </div>
+      <div class="expected">
+        <strong>Expected Result:</strong>
+        <ul>
+          <li>Toggle switch reverts to original state</li>
+          <li>Error message: "This extension cannot run on browser pages. Try a regular website."</li>
+          <li>Error auto-dismisses after 5 seconds</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 3: Content Script Not Loaded</h3>
+      <div class="test-steps">
+        <strong>Steps:</strong>
+        <ol>
+          <li>Navigate to a regular website (e.g., example.com)</li>
+          <li>Immediately open the popup before page fully loads</li>
+          <li>Try to toggle the theme</li>
+        </ol>
+      </div>
+      <div class="expected">
+        <strong>Expected Result:</strong>
+        <ul>
+          <li>If content script not ready: Error message "Content script not loaded. Try refreshing the page."</li>
+          <li>Toggle state reverts</li>
+          <li>Error auto-dismisses after 5 seconds</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 4: Invalid Hostname Validation</h3>
+      <div class="test-steps">
+        <strong>Steps:</strong>
+        <ol>
+          <li>Navigate to any regular website</li>
+          <li>Open the popup</li>
+          <li>In the whitelist section, try to add: <span class="code">http://example.com</span></li>
+          <li>Click "Add"</li>
+        </ol>
+      </div>
+      <div class="expected">
+        <strong>Expected Result:</strong>
+        <ul>
+          <li>Validation error appears below input: "Invalid hostname format. Please enter a valid domain (e.g.,
+            example.com)"</li>
+          <li>Site is NOT added to the list</li>
+          <li>Error auto-dismisses after 4 seconds</li>
+          <li>No alert() popup</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 5: Empty Hostname Validation</h3>
+      <div class="test-steps">
+        <strong>Steps:</strong>
+        <ol>
+          <li>In the whitelist section, leave input empty</li>
+          <li>Click "Add"</li>
+        </ol>
+      </div>
+      <div class="expected">
+        <strong>Expected Result:</strong>
+        <ul>
+          <li>Validation error: "Please enter a site name"</li>
+          <li>Error auto-dismisses after 3 seconds</li>
+          <li>No alert() popup</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 6: Duplicate Site Validation</h3>
+      <div class="test-steps">
+        <strong>Steps:</strong>
+        <ol>
+          <li>Add <span class="code">example.com</span> to whitelist</li>
+          <li>Try to add <span class="code">example.com</span> again</li>
+        </ol>
+      </div>
+      <div class="expected">
+        <strong>Expected Result:</strong>
+        <ul>
+          <li>Validation error: "example.com is already in the whitelist"</li>
+          <li>Site is NOT added twice</li>
+          <li>Error auto-dismisses after 3 seconds</li>
+          <li>No alert() popup</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 7: Intensity Slider on Restricted Page</h3>
+      <div class="test-steps">
+        <strong>Steps:</strong>
+        <ol>
+          <li>Navigate to <span class="code">chrome://extensions</span></li>
+          <li>Open the popup</li>
+          <li>Adjust the intensity slider</li>
+          <li>Check console for errors</li>
+        </ol>
+      </div>
+      <div class="expected">
+        <strong>Expected Result:</strong>
+        <ul>
+          <li>Slider moves smoothly</li>
+          <li>Percentage updates in real-time</li>
+          <li>No errors thrown (graceful degradation)</li>
+          <li>Console may show warning about content script, but no errors</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 8: Success Message Auto-Dismiss</h3>
+      <div class="test-steps">
+        <strong>Steps:</strong>
+        <ol>
+          <li>Navigate to a regular website</li>
+          <li>Open the popup</li>
+          <li>Toggle the dark theme on</li>
+          <li>Wait and observe</li>
+        </ol>
+      </div>
+      <div class="expected">
+        <strong>Expected Result:</strong>
+        <ul>
+          <li>Success message appears: "Dark theme enabled"</li>
+          <li>Message has green background</li>
+          <li>Message auto-dismisses after 2 seconds</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 9: Whitelist/Blacklist Error Handling</h3>
+      <div class="test-steps">
+        <strong>Steps:</strong>
+        <ol>
+          <li>Navigate to <span class="code">chrome://extensions</span></li>
+          <li>Open the popup</li>
+          <li>Try to add current site to whitelist</li>
+        </ol>
+      </div>
+      <div class="expected">
+        <strong>Expected Result:</strong>
+        <ul>
+          <li>Site is added to whitelist (storage operation succeeds)</li>
+          <li>If trying to apply theme: Error message about restricted page</li>
+          <li>Whitelist state remains consistent</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="test-case">
+      <h3>Test 10: State Rollback on Error</h3>
+      <div class="test-steps">
+        <strong>Steps:</strong>
+        <ol>
+          <li>Navigate to a regular website with dark theme OFF</li>
+          <li>Open DevTools and simulate a network error (if possible)</li>
+          <li>Try to toggle theme ON</li>
+          <li>Observe the toggle state</li>
+        </ol>
+      </div>
+      <div class="expected">
+        <strong>Expected Result:</strong>
+        <ul>
+          <li>If error occurs, toggle reverts to OFF position</li>
+          <li>Error message is displayed</li>
+          <li>UI state matches actual state</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>✅ Verification Checklist</h2>
+    <ul class="checklist">
+      <li>All chrome API calls are wrapped in try-catch blocks</li>
+      <li>Error messages are user-friendly (no technical jargon)</li>
+      <li>Restricted pages are detected and handled properly</li>
+      <li>Validation errors appear inline (no alert() popups)</li>
+      <li>Error messages auto-dismiss after appropriate time</li>
+      <li>Success messages auto-dismiss after 2 seconds</li>
+      <li>UI state reverts on error (rollback)</li>
+      <li>Extension remains functional even when errors occur</li>
+      <li>Console shows appropriate error logs for debugging</li>
+      <li>No unhandled promise rejections in console</li>
+    </ul>
+  </div>
+
+  <div class="test-section">
+    <h2>🔍 Implementation Details</h2>
+
+    <div class="implementation">
+      <h4>Error Handling Features Added:</h4>
+      <ul>
+        <li><strong>isRestrictedUrl() Helper:</strong> Centralized function to detect restricted pages</li>
+        <li><strong>Enhanced sendMessageToContentScript():</strong> Validates tab, checks URL, provides specific error
+          messages</li>
+        <li><strong>Settings Load Error Handling:</strong> Fallback to defaults if storage fails</li>
+        <li><strong>Tab Query Error Handling:</strong> Detects and handles missing/invalid tabs</li>
+        <li><strong>Validation Error State:</strong> Replaced alert() with inline error display in SiteList</li>
+        <li><strong>Storage Quota Detection:</strong> Specific error message for quota exceeded</li>
+        <li><strong>Content Script Detection:</strong> Handles "Receiving end does not exist" error</li>
+        <li><strong>State Rollback:</strong> Reverts UI state when operations fail</li>
+      </ul>
+    </div>
+
+    <div class="implementation">
+      <h4>Error Message Types:</h4>
+      <ul>
+        <li><strong>Restricted Page:</strong> "This extension cannot run on browser pages. Try a regular website."</li>
+        <li><strong>Content Script Not Loaded:</strong> "Content script not loaded. Try refreshing the page."</li>
+        <li><strong>Storage Quota:</strong> "Storage quota exceeded. Please remove some sites from your lists."</li>
+        <li><strong>Invalid Hostname:</strong> "Invalid hostname format. Please enter a valid domain (e.g.,
+          example.com)"</li>
+        <li><strong>Duplicate Site:</strong> "[site] is already in the [list]"</li>
+        <li><strong>Empty Input:</strong> "Please enter a site name"</li>
+        <li><strong>Generic Error:</strong> "Failed to [action]. Please try again."</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>🐛 Known Edge Cases</h2>
+    <div class="warning">
+      <strong>Note:</strong> The following edge cases are handled gracefully:
+      <ul>
+        <li>Opening popup before page fully loads</li>
+        <li>Navigating to restricted pages (chrome://, edge://, about:, etc.)</li>
+        <li>Content script injection failures</li>
+        <li>Storage API unavailability</li>
+        <li>Invalid or missing tab information</li>
+        <li>Malformed hostname inputs</li>
+        <li>Duplicate site entries</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>📊 Test Results</h2>
+    <p>Record your test results here:</p>
+    <textarea
+      style="width: 100%; height: 200px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit;"
+      placeholder="Enter your test results and observations here..."></textarea>
+  </div>
+
+  <div class="info" style="margin-top: 30px;">
+    <strong>✨ Testing Complete!</strong><br>
+    If all tests pass, Task 18 is successfully implemented. The popup now has comprehensive error handling that provides
+    a robust and user-friendly experience.
+  </div>
+</body>
+
+</html>

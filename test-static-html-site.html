@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Static HTML Site Test - Dark Theme Extension</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    header {
+      background-color: #f0f0f0;
+      padding: 20px;
+      border-bottom: 2px solid #333;
+    }
+
+    nav {
+      background-color: #e0e0e0;
+      padding: 10px;
+      margin: 20px 0;
+    }
+
+    nav a {
+      margin-right: 15px;
+      color: #0066cc;
+      text-decoration: none;
+    }
+
+    nav a:visited {
+      color: #551a8b;
+    }
+
+    .content-section {
+      background-color: #fafafa;
+      padding: 20px;
+      margin: 20px 0;
+      border: 1px solid #ddd;
+    }
+
+    .card {
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 15px;
+      margin: 10px 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    input,
+    textarea,
+    select {
+      padding: 8px;
+      margin: 5px 0;
+      border: 1px solid #999;
+      background-color: white;
+      color: black;
+    }
+
+    button {
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    button:hover {
+      background-color: #0052a3;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    .image-container {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border: 2px solid #ddd;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Static HTML Site Test</h1>
+    <p>Testing dark theme extension on a traditional static HTML page</p>
+  </header>
+
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#about">About</a>
+    <a href="#services">Services</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <div class="content-section">
+    <h2>Text Content Test</h2>
+    <p>This is a paragraph with regular text. The dark theme should invert the background and text colors while
+      maintaining readability.</p>
+    <p>Here's a <a href="#link">link</a> and a <a href="#visited">visited link</a> to test link color handling.</p>
+    <blockquote style="border-left: 4px solid #0066cc; padding-left: 15px; margin: 20px 0;">
+      This is a blockquote to test how quoted text appears with the dark theme applied.
+    </blockquote>
+  </div>
+
+  <div class="content-section">
+    <h2>Form Elements Test</h2>
+    <form>
+      <div>
+        <label for="text-input">Text Input:</label><br>
+        <input type="text" id="text-input" placeholder="Enter text here" style="width: 300px;">
+      </div>
+      <div>
+        <label for="textarea">Textarea:</label><br>
+        <textarea id="textarea" rows="4" style="width: 300px;" placeholder="Enter multiple lines"></textarea>
+      </div>
+      <div>
+        <label for="select">Select Dropdown:</label><br>
+        <select id="select" style="width: 300px;">
+          <option>Option 1</option>
+          <option>Option 2</option>
+          <option>Option 3</option>
+        </select>
+      </div>
+      <div>
+        <label>
+          <input type="checkbox"> Checkbox option
+        </label>
+      </div>
+      <div>
+        <label>
+          <input type="radio" name="radio"> Radio option 1
+        </label>
+        <label>
+          <input type="radio" name="radio"> Radio option 2
+        </label>
+      </div>
+      <div>
+        <button type="button">Submit Button</button>
+        <button type="button" style="background-color: #28a745;">Success Button</button>
+        <button type="button" style="background-color: #dc3545;">Danger Button</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="content-section">
+    <h2>Card Components Test</h2>
+    <div class="card">
+      <h3>Card Title 1</h3>
+      <p>Card content with text. This tests nested elements with different background colors.</p>
+      <button>Card Action</button>
+    </div>
+    <div class="card">
+      <h3>Card Title 2</h3>
+      <p>Another card to test consistency across multiple similar elements.</p>
+      <button>Card Action</button>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <h2>Table Test</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Header 1</th>
+          <th>Header 2</th>
+          <th>Header 3</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Row 1, Cell 1</td>
+          <td>Row 1, Cell 2</td>
+          <td>Row 1, Cell 3</td>
+        </tr>
+        <tr>
+          <td>Row 2, Cell 1</td>
+          <td>Row 2, Cell 2</td>
+          <td>Row 2, Cell 3</td>
+        </tr>
+        <tr>
+          <td>Row 3, Cell 1</td>
+          <td>Row 3, Cell 2</td>
+          <td>Row 3, Cell 3</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="content-section">
+    <h2>Image Test</h2>
+    <div class="image-container">
+      <p>Images should not be over-inverted. They should maintain natural appearance with slight brightness adjustment.
+      </p>
+      <svg width="400" height="200" style="border: 1px solid #ddd;">
+        <rect width="400" height="200" fill="#f0f0f0" />
+        <circle cx="100" cy="100" r="50" fill="#0066cc" />
+        <rect x="200" y="50" width="150" height="100" fill="#28a745" />
+        <text x="200" y="30" font-family="Arial" font-size="20" fill="#333">SVG Test Image</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <h2>List Test</h2>
+    <h3>Unordered List</h3>
+    <ul>
+      <li>List item 1</li>
+      <li>List item 2</li>
+      <li>List item 3 with <a href="#">a link</a></li>
+    </ul>
+
+    <h3>Ordered List</h3>
+    <ol>
+      <li>First item</li>
+      <li>Second item</li>
+      <li>Third item</li>
+    </ol>
+  </div>
+
+  <footer style="margin-top: 40px; padding: 20px; background-color: #333; color: white; text-align: center;">
+    <p>Footer content - typically has inverted colors already</p>
+    <p>&copy; 2024 Dark Theme Extension Test</p>
+  </footer>
+
+  <script>
+    // Simulate visited link
+    document.querySelector('a[href="#visited"]').style.color = '#551a8b';
+
+    console.log('Static HTML test page loaded');
+    console.log('Test the dark theme extension by:');
+    console.log('1. Clicking the extension icon');
+    console.log('2. Toggling dark theme on/off');
+    console.log('3. Adjusting intensity slider');
+    console.log('4. Verifying all elements render correctly');
+  </script>
+</body>
+
+</html>

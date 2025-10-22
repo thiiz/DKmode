@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intensity Slider Test</title>
+  <style>
+    :root {
+      --dark-theme-intensity: 0.8;
+      --dark-bg: hsl(0, 0%, calc(10% * var(--dark-theme-intensity)));
+      --dark-text: hsl(0, 0%, calc(90% + (10% * (1 - var(--dark-theme-intensity)))));
+      --dark-border: hsl(0, 0%, calc(30% * var(--dark-theme-intensity)));
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+      transition: all 0.3s ease;
+    }
+
+    .dark-theme-active {
+      background-color: var(--dark-bg) !important;
+      color: var(--dark-text) !important;
+    }
+
+    .dark-theme-active * {
+      background-color: var(--dark-bg) !important;
+      color: var(--dark-text) !important;
+      border-color: var(--dark-border) !important;
+    }
+
+    .test-container {
+      border: 2px solid #333;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+
+    .controls {
+      margin: 20px 0;
+      padding: 20px;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+
+    .slider-container {
+      margin: 20px 0;
+    }
+
+    .slider {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(to right, #e0e0e0 0%, #4CAF50 100%);
+      outline: none;
+      cursor: pointer;
+    }
+
+    .value-display {
+      font-size: 24px;
+      font-weight: bold;
+      color: #4CAF50;
+      margin: 10px 0;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background: #4CAF50;
+      color: white;
+      font-weight: 500;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    .info {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border-left: 4px solid #2196F3;
+    }
+
+    .test-content {
+      margin: 20px 0;
+    }
+
+    .test-content h2 {
+      color: #333;
+    }
+
+    .test-content p {
+      line-height: 1.6;
+    }
+
+    input[type="text"] {
+      padding: 8px;
+      margin: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🌙 Intensity Slider Test Page</h1>
+
+  <div class="info">
+    <strong>Test Instructions:</strong>
+    <ol>
+      <li>Click "Toggle Dark Theme" to enable/disable dark mode</li>
+      <li>Adjust the intensity slider (0-100)</li>
+      <li>Observe how the darkness level changes in real-time</li>
+      <li>Test different intensity values to see the effect</li>
+    </ol>
+  </div>
+
+  <div class="controls">
+    <h3>Controls</h3>
+    <button id="toggleBtn">Toggle Dark Theme</button>
+
+    <div class="slider-container">
+      <label for="intensitySlider">
+        <strong>Intensity:</strong>
+        <span class="value-display" id="intensityValue">80%</span>
+      </label>
+      <input type="range" id="intensitySlider" class="slider" min="0" max="100" value="80">
+      <div style="display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-top: 5px;">
+        <span>Subtle (0%)</span>
+        <span>Maximum (100%)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="test-container">
+    <div class="test-content">
+      <h2>Sample Content</h2>
+      <p>This is a test paragraph to demonstrate how the dark theme affects text readability at different intensity
+        levels.</p>
+
+      <h3>Form Elements</h3>
+      <input type="text" placeholder="Test input field" value="Sample text">
+      <button>Sample Button</button>
+
+      <h3>More Text</h3>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore
+        magna aliqua.</p>
+
+      <ul>
+        <li>List item 1</li>
+        <li>List item 2</li>
+        <li>List item 3</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="test-container">
+    <h3>Expected Behavior:</h3>
+    <ul>
+      <li>✅ Intensity at 0%: Very subtle dark theme (almost no change)</li>
+      <li>✅ Intensity at 50%: Moderate dark theme</li>
+      <li>✅ Intensity at 100%: Maximum dark theme (darkest background, brightest text)</li>
+      <li>✅ Changes should be smooth and immediate</li>
+      <li>✅ All text should remain readable at all intensity levels</li>
+    </ul>
+  </div>
+
+  <script>
+    const toggleBtn = document.getElementById('toggleBtn');
+    const intensitySlider = document.getElementById('intensitySlider');
+    const intensityValue = document.getElementById('intensityValue');
+    const body = document.body;
+
+    let isDarkThemeActive = false;
+
+    // Toggle dark theme
+    toggleBtn.addEventListener('click', () => {
+      isDarkThemeActive = !isDarkThemeActive;
+
+      if (isDarkThemeActive) {
+        body.classList.add('dark-theme-active');
+        toggleBtn.textContent = 'Disable Dark Theme';
+        applyIntensity(parseInt(intensitySlider.value));
+      } else {
+        body.classList.remove('dark-theme-active');
+        toggleBtn.textContent = 'Enable Dark Theme';
+      }
+    });
+
+    // Update intensity
+    intensitySlider.addEventListener('input', (e) => {
+      const intensity = parseInt(e.target.value);
+      intensityValue.textContent = `${intensity}%`;
+
+      if (isDarkThemeActive) {
+        applyIntensity(intensity);
+      }
+    });
+
+    // Apply intensity to CSS custom property
+    function applyIntensity(intensity) {
+      const normalizedIntensity = intensity / 100;
+      document.documentElement.style.setProperty('--dark-theme-intensity', normalizedIntensity);
+      console.log(`Applied intensity: ${intensity}% (${normalizedIntensity})`);
+    }
+
+    // Log initial state
+    console.log('Intensity Slider Test Page Loaded');
+    console.log('Initial intensity:', intensitySlider.value);
+  </script>
+</body>
+
+</html>

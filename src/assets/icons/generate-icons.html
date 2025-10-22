@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generate Extension Icons</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f0f0f0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .icon-preview {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+
+    .icon-item {
+      text-align: center;
+    }
+
+    canvas {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: white;
+    }
+
+    button {
+      background: #4285f4;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+
+    button:hover {
+      background: #357ae8;
+    }
+
+    .instructions {
+      background: #e8f0fe;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+    }
+
+    .instructions code {
+      background: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🌙 Dark Theme Extension Icons</h1>
+
+    <div class="instructions">
+      <h3>Instructions:</h3>
+      <ol>
+        <li>Click "Generate All Icons" button below</li>
+        <li>Right-click each icon and select "Save image as..."</li>
+        <li>Save with the exact filename shown (e.g., <code>icon-16.png</code>)</li>
+        <li>Save all icons to the <code>src/assets/icons/</code> directory</li>
+      </ol>
+    </div>
+
+    <button onclick="generateAllIcons()">Generate All Icons</button>
+    <button onclick="downloadAllIcons()">Download All Icons</button>
+
+    <div class="icon-preview" id="iconPreview"></div>
+  </div>
+
+  <script>
+    const sizes = [16, 32, 48, 128];
+
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      canvas.width = size;
+      canvas.height = size;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, size, size);
+
+      // Background circle with gradient
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#1a1a2e');
+      gradient.addColorStop(1, '#16213e');
+
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Moon/crescent shape
+      const moonSize = size * 0.6;
+      const moonX = size / 2;
+      const moonY = size / 2;
+
+      // Outer circle (full moon)
+      ctx.fillStyle = '#ffd700';
+      ctx.beginPath();
+      ctx.arc(moonX, moonY, moonSize / 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Inner circle (to create crescent)
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(moonX + moonSize * 0.15, moonY - moonSize * 0.05, moonSize / 2.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Add some stars for larger icons
+      if (size >= 48) {
+        ctx.fillStyle = '#ffffff';
+        const stars = [
+          { x: size * 0.2, y: size * 0.25, r: size * 0.03 },
+          { x: size * 0.8, y: size * 0.3, r: size * 0.025 },
+          { x: size * 0.75, y: size * 0.7, r: size * 0.02 },
+          { x: size * 0.25, y: size * 0.75, r: size * 0.025 }
+        ];
+
+        stars.forEach(star => {
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+    }
+
+    function generateAllIcons() {
+      const preview = document.getElementById('iconPreview');
+      preview.innerHTML = '';
+
+      sizes.forEach(size => {
+        const container = document.createElement('div');
+        container.className = 'icon-item';
+
+        const canvas = document.createElement('canvas');
+        drawIcon(canvas, size);
+
+        const label = document.createElement('p');
+        label.textContent = `${size}x${size}`;
+        label.style.margin = '10px 0 5px 0';
+        label.style.fontWeight = 'bold';
+
+        const filename = document.createElement('p');
+        filename.textContent = `icon-${size}.png`;
+        filename.style.margin = '0';
+        filename.style.fontSize = '12px';
+        filename.style.color = '#666';
+
+        const downloadBtn = document.createElement('button');
+        downloadBtn.textContent = 'Download';
+        downloadBtn.onclick = () => downloadIcon(canvas, size);
+
+        container.appendChild(canvas);
+        container.appendChild(label);
+        container.appendChild(filename);
+        container.appendChild(downloadBtn);
+        preview.appendChild(container);
+      });
+    }
+
+    function downloadIcon(canvas, size) {
+      const link = document.createElement('a');
+      link.download = `icon-${size}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    function downloadAllIcons() {
+      const canvases = document.querySelectorAll('canvas');
+      canvases.forEach((canvas, index) => {
+        setTimeout(() => {
+          downloadIcon(canvas, sizes[index]);
+        }, index * 200); // Stagger downloads
+      });
+    }
+
+    // Generate icons on page load
+    window.onload = generateAllIcons;
+  </script>
+</body>
+
+</html>

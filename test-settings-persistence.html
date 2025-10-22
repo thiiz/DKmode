@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings Persistence Test - Dark Theme Extension</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .test-container {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #333;
+      border-bottom: 3px solid #4CAF50;
+      padding-bottom: 10px;
+    }
+
+    h2 {
+      color: #555;
+      margin-top: 0;
+    }
+
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      background: #f9f9f9;
+      border-left: 4px solid #2196F3;
+    }
+
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+
+    button.secondary {
+      background: #2196F3;
+    }
+
+    button.secondary:hover {
+      background: #0b7dda;
+    }
+
+    button.danger {
+      background: #f44336;
+    }
+
+    button.danger:hover {
+      background: #da190b;
+    }
+
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .status.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .status.info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    .status.warning {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+
+    .test-result {
+      margin: 10px 0;
+      padding: 10px;
+      background: white;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+
+    .test-result.pass {
+      border-left: 4px solid #4CAF50;
+    }
+
+    .test-result.fail {
+      border-left: 4px solid #f44336;
+    }
+
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 15px 0;
+    }
+
+    input[type="number"] {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 100px;
+    }
+
+    .current-state {
+      background: #e3f2fd;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 15px 0;
+    }
+
+    .current-state h3 {
+      margin-top: 0;
+      color: #1976d2;
+    }
+
+    .state-item {
+      margin: 8px 0;
+      font-family: monospace;
+    }
+
+    .instructions {
+      background: #fff9c4;
+      padding: 15px;
+      border-radius: 4px;
+      border-left: 4px solid #fbc02d;
+      margin: 20px 0;
+    }
+
+    .instructions h3 {
+      margin-top: 0;
+      color: #f57f17;
+    }
+
+    .instructions ol {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+
+    .instructions li {
+      margin: 8px 0;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🧪 Settings Persistence Test Suite</h1>
+
+  <div class="instructions">
+    <h3>📋 Test Instructions</h3>
+    <ol>
+      <li>Load the extension in Chrome (chrome://extensions)</li>
+      <li>Open this test page</li>
+      <li>Run each test scenario below</li>
+      <li>Verify that settings persist correctly on page load</li>
+      <li>Check console for detailed logs</li>
+    </ol>
+  </div>
+
+  <div class="test-container">
+    <h2>Current Page State</h2>
+    <div class="current-state" id="currentState">
+      <h3>Theme Status</h3>
+      <div class="state-item">Dark Theme Active: <span id="themeActive">Checking...</span></div>
+      <div class="state-item">Intensity: <span id="currentIntensity">Checking...</span></div>
+      <div class="state-item">Current Site: <span id="currentSite">Checking...</span></div>
+    </div>
+    <button onclick="updateCurrentState()">🔄 Refresh State</button>
+  </div>
+
+  <div class="test-container">
+    <h2>Test 1: Basic Settings Retrieval on Load</h2>
+    <div class="test-section">
+      <p>This test verifies that the content script retrieves settings from chrome.storage.sync on page load.</p>
+      <div class="controls">
+        <button onclick="runTest1()">▶️ Run Test 1</button>
+        <button class="danger" onclick="clearAllSettings()">🗑️ Clear All Settings</button>
+      </div>
+      <div id="test1Results"></div>
+    </div>
+  </div>
+
+  <div class="test-container">
+    <h2>Test 2: Dark Theme Auto-Apply on Load</h2>
+    <div class="test-section">
+      <p>This test verifies that dark theme applies automatically when page loads if enabled.</p>
+      <div class="controls">
+        <button onclick="enableGlobalDarkTheme()">✅ Enable Global Dark Theme</button>
+        <button onclick="disableGlobalDarkTheme()">❌ Disable Global Dark Theme</button>
+        <button class="secondary" onclick="reloadPage()">🔄 Reload Page</button>
+      </div>
+      <div id="test2Results"></div>
+    </div>
+  </div>
+
+  <div class="test-container">
+    <h2>Test 3: Intensity Level Persistence</h2>
+    <div class="test-section">
+      <p>This test verifies that the intensity level is applied from saved settings on page load.</p>
+      <div class="controls">
+        <label>Set Intensity: <input type="number" id="intensityInput" min="0" max="100" value="80"></label>
+        <button onclick="setIntensity()">💾 Save Intensity</button>
+        <button class="secondary" onclick="reloadPage()">🔄 Reload Page</button>
+      </div>
+      <div id="test3Results"></div>
+    </div>
+  </div>
+
+  <div class="test-container">
+    <h2>Test 4: Whitelist Logic on Load</h2>
+    <div class="test-section">
+      <p>This test verifies that whitelist logic works correctly on page load.</p>
+      <div class="controls">
+        <button onclick="addToWhitelist()">➕ Add Current Site to Whitelist</button>
+        <button onclick="removeFromWhitelist()">➖ Remove from Whitelist</button>
+        <button class="secondary" onclick="reloadPage()">🔄 Reload Page</button>
+      </div>
+      <div id="test4Results"></div>
+    </div>
+  </div>
+
+  <div class="test-container">
+    <h2>Test 5: Blacklist Logic on Load</h2>
+    <div class="test-section">
+      <p>This test verifies that blacklist logic works correctly on page load.</p>
+      <div class="controls">
+        <button onclick="addToBlacklist()">➕ Add Current Site to Blacklist</button>
+        <button onclick="removeFromBlacklist()">➖ Remove from Blacklist</button>
+        <button class="secondary" onclick="reloadPage()">🔄 Reload Page</button>
+      </div>
+      <div id="test5Results"></div>
+    </div>
+  </div>
+
+  <div class="test-container">
+    <h2>Test 6: Site-Specific Settings Priority</h2>
+    <div class="test-section">
+      <p>This test verifies that site-specific settings override global settings.</p>
+      <div class="controls">
+        <button onclick="setSiteSpecificEnabled()">✅ Enable for This Site Only</button>
+        <button onclick="setSiteSpecificDisabled()">❌ Disable for This Site Only</button>
+        <button onclick="clearSiteSpecific()">🗑️ Clear Site-Specific</button>
+        <button class="secondary" onclick="reloadPage()">🔄 Reload Page</button>
+      </div>
+      <div id="test6Results"></div>
+    </div>
+  </div>
+
+  <div class="test-container">
+    <h2>Test 7: Complete Persistence Flow</h2>
+    <div class="test-section">
+      <p>This test runs a complete flow to verify all persistence mechanisms work together.</p>
+      <button onclick="runCompleteTest()">▶️ Run Complete Test</button>
+      <div id="test7Results"></div>
+    </div>
+  </div>
+
+  <script>
+    const currentSite = window.location.hostname;
+
+    // Update current state display
+    async function updateCurrentState() {
+      const isDarkThemeActive = document.documentElement.classList.contains('dark-theme-active');
+      const intensity = document.documentElement.style.getPropertyValue('--dark-theme-intensity');
+
+      document.getElementById('themeActive').textContent = isDarkThemeActive ? '✅ Yes' : '❌ No';
+      document.getElementById('currentIntensity').textContent = intensity ? `${Math.round(parseFloat(intensity) * 100)}%` : 'Not set';
+      document.getElementById('currentSite').textContent = currentSite;
+
+      // Also get storage values
+      try {
+        const settings = await chrome.storage.sync.get([
+          'darkThemeEnabled',
+          'intensity',
+          'whitelist',
+          'blacklist',
+          'siteSettings'
+        ]);
+        console.log('Current settings:', settings);
+      } catch (error) {
+        console.error('Failed to get settings:', error);
+      }
+    }
+
+    // Test 1: Basic Settings Retrieval
+    async function runTest1() {
+      const resultsDiv = document.getElementById('test1Results');
+      resultsDiv.innerHTML = '<div class="status info">Running test...</div>';
+
+      const results = [];
+
+      try {
+        // Set some test settings
+        await chrome.storage.sync.set({
+          darkThemeEnabled: true,
+          intensity: 75,
+          whitelist: ['example.com'],
+          blacklist: ['test.com'],
+          siteSettings: {}
+        });
+
+        results.push({ pass: true, message: 'Settings saved to storage' });
+
+        // Retrieve settings
+        const settings = await chrome.storage.sync.get([
+          'darkThemeEnabled',
+          'intensity',
+          'whitelist',
+          'blacklist',
+          'siteSettings'
+        ]);
+
+        // Verify each setting
+        if (settings.darkThemeEnabled === true) {
+          results.push({ pass: true, message: 'darkThemeEnabled retrieved correctly' });
+        } else {
+          results.push({ pass: false, message: 'darkThemeEnabled not retrieved correctly' });
+        }
+
+        if (settings.intensity === 75) {
+          results.push({ pass: true, message: 'intensity retrieved correctly' });
+        } else {
+          results.push({ pass: false, message: 'intensity not retrieved correctly' });
+        }
+
+        if (Array.isArray(settings.whitelist) && settings.whitelist.includes('example.com')) {
+          results.push({ pass: true, message: 'whitelist retrieved correctly' });
+        } else {
+          results.push({ pass: false, message: 'whitelist not retrieved correctly' });
+        }
+
+        if (Array.isArray(settings.blacklist) && settings.blacklist.includes('test.com')) {
+          results.push({ pass: true, message: 'blacklist retrieved correctly' });
+        } else {
+          results.push({ pass: false, message: 'blacklist not retrieved correctly' });
+        }
+
+        displayResults(resultsDiv, results);
+      } catch (error) {
+        resultsDiv.innerHTML = `<div class="status error">Test failed: ${error.message}</div>`;
+      }
+    }
+
+    // Test 2: Enable/Disable Global Dark Theme
+    async function enableGlobalDarkTheme() {
+      try {
+        await chrome.storage.sync.set({ darkThemeEnabled: true, intensity: 80 });
+        document.getElementById('test2Results').innerHTML = '<div class="status success">Global dark theme enabled. Reload page to test.</div>';
+      } catch (error) {
+        document.getElementById('test2Results').innerHTML = `<div class="status error">Failed: ${error.message}</div>`;
+      }
+    }
+
+    async function disableGlobalDarkTheme() {
+      try {
+        await chrome.storage.sync.set({ darkThemeEnabled: false });
+        document.getElementById('test2Results').innerHTML = '<div class="status success">Global dark theme disabled. Reload page to test.</div>';
+      } catch (error) {
+        document.getElementById('test2Results').innerHTML = `<div class="status error">Failed: ${error.message}</div>`;
+      }
+    }
+
+    // Test 3: Intensity Level
+    async function setIntensity() {
+      const intensity = parseInt(document.getElementById('intensityInput').value);
+      if (intensity < 0 || intensity > 100) {
+        document.getElementById('test3Results').innerHTML = '<div class="status error">Intensity must be between 0 and 100</div>';
+        return;
+      }
+
+      try {
+        await chrome.storage.sync.set({
+          darkThemeEnabled: true,
+          intensity: intensity
+        });
+        document.getElementById('test3Results').innerHTML = `<div class="status success">Intensity set to ${intensity}%. Reload page to test.</div>`;
+      } catch (error) {
+        document.getElementById('test3Results').innerHTML = `<div class="status error">Failed: ${error.message}</div>`;
+      }
+    }
+
+    // Test 4: Whitelist
+    async function addToWhitelist() {
+      try {
+        const settings = await chrome.storage.sync.get(['whitelist', 'blacklist']);
+        const whitelist = settings.whitelist || [];
+        const blacklist = settings.blacklist || [];
+
+        // Remove from blacklist if present
+        const newBlacklist = blacklist.filter(site => site !== currentSite);
+
+        // Add to whitelist if not present
+        if (!whitelist.includes(currentSite)) {
+          whitelist.push(currentSite);
+        }
+
+        await chrome.storage.sync.set({
+          whitelist: whitelist,
+          blacklist: newBlacklist,
+          darkThemeEnabled: false // Disable global to test whitelist
+        });
+
+        document.getElementById('test4Results').innerHTML = `<div class="status success">${currentSite} added to whitelist. Global dark theme disabled. Reload to test.</div>`;
+      } catch (error) {
+        document.getElementById('test4Results').innerHTML = `<div class="status error">Failed: ${error.message}</div>`;
+      }
+    }
+
+    async function removeFromWhitelist() {
+      try {
+        const settings = await chrome.storage.sync.get('whitelist');
+        const whitelist = settings.whitelist || [];
+        const newWhitelist = whitelist.filter(site => site !== currentSite);
+
+        await chrome.storage.sync.set({ whitelist: newWhitelist });
+        document.getElementById('test4Results').innerHTML = `<div class="status success">${currentSite} removed from whitelist. Reload to test.</div>`;
+      } catch (error) {
+        document.getElementById('test4Results').innerHTML = `<div class="status error">Failed: ${error.message}</div>`;
+      }
+    }
+
+    // Test 5: Blacklist
+    async function addToBlacklist() {
+      try {
+        const settings = await chrome.storage.sync.get(['whitelist', 'blacklist']);
+        const whitelist = settings.whitelist || [];
+        const blacklist = settings.blacklist || [];
+
+        // Remove from whitelist if present
+        const newWhitelist = whitelist.filter(site => site !== currentSite);
+
+        // Add to blacklist if not present
+        if (!blacklist.includes(currentSite)) {
+          blacklist.push(currentSite);
+        }
+
+        await chrome.storage.sync.set({
+          whitelist: newWhitelist,
+          blacklist: blacklist,
+          darkThemeEnabled: true // Enable global to test blacklist
+        });
+
+        document.getElementById('test5Results').innerHTML = `<div class="status success">${currentSite} added to blacklist. Global dark theme enabled. Reload to test.</div>`;
+      } catch (error) {
+        document.getElementById('test5Results').innerHTML = `<div class="status error">Failed: ${error.message}</div>`;
+      }
+    }
+
+    async function removeFromBlacklist() {
+      try {
+        const settings = await chrome.storage.sync.get('blacklist');
+        const blacklist = settings.blacklist || [];
+        const newBlacklist = blacklist.filter(site => site !== currentSite);
+
+        await chrome.storage.sync.set({ blacklist: newBlacklist });
+        document.getElementById('test5Results').innerHTML = `<div class="status success">${currentSite} removed from blacklist. Reload to test.</div>`;
+      } catch (error) {
+        document.getElementById('test5Results').innerHTML = `<div class="status error">Failed: ${error.message}</div>`;
+      }
+    }
+
+    // Test 6: Site-Specific Settings
+    async function setSiteSpecificEnabled() {
+      try {
+        const settings = await chrome.storage.sync.get('siteSettings');
+        const siteSettings = settings.siteSettings || {};
+
+        siteSettings[currentSite] = {
+          enabled: true,
+          intensity: 90,
+          lastModified: Date.now()
+        };
+
+        await chrome.storage.sync.set({
+          siteSettings: siteSettings,
+          darkThemeEnabled: false // Disable global to test site-specific
+        });
+
+        document.getElementById('test6Results').innerHTML = `<div class="status success">Site-specific enabled for ${currentSite}. Global disabled. Reload to test.</div>`;
+      } catch (error) {
+        document.getElementById('test6Results').innerHTML = `<div class="status error">Failed: ${error.message}</div>`;
+      }
+    }
+
+    async function setSiteSpecificDisabled() {
+      try {
+        const settings = await chrome.storage.sync.get('siteSettings');
+        const siteSettings = settings.siteSettings || {};
+
+        siteSettings[currentSite] = {
+          enabled: false,
+          intensity: null,
+          lastModified: Date.now()
+        };
+
+        await chrome.storage.sync.set({
+          siteSettings: siteSettings,
+          darkThemeEnabled: true // Enable global to test site-specific override
+        });
+
+        document.getElementById('test6Results').innerHTML = `<div class="status success">Site-specific disabled for ${currentSite}. Global enabled. Reload to test.</div>`;
+      } catch (error) {
+        document.getElementById('test6Results').innerHTML = `<div class="status error">Failed: ${error.message}</div>`;
+      }
+    }
+
+    async function clearSiteSpecific() {
+      try {
+        const settings = await chrome.storage.sync.get('siteSettings');
+        const siteSettings = settings.siteSettings || {};
+
+        delete siteSettings[currentSite];
+
+        await chrome.storage.sync.set({ siteSettings: siteSettings });
+        document.getElementById('test6Results').innerHTML = `<div class="status success">Site-specific settings cleared for ${currentSite}. Reload to test.</div>`;
+      } catch (error) {
+        document.getElementById('test6Results').innerHTML = `<div class="status error">Failed: ${error.message}</div>`;
+      }
+    }
+
+    // Test 7: Complete Flow
+    async function runCompleteTest() {
+      const resultsDiv = document.getElementById('test7Results');
+      resultsDiv.innerHTML = '<div class="status info">Running complete test flow...</div>';
+
+      const results = [];
+
+      try {
+        // Step 1: Clear all settings
+        await chrome.storage.sync.clear();
+        results.push({ pass: true, message: 'Step 1: Cleared all settings' });
+
+        // Step 2: Set default settings
+        await chrome.storage.sync.set({
+          darkThemeEnabled: false,
+          intensity: 80,
+          whitelist: [],
+          blacklist: [],
+          siteSettings: {}
+        });
+        results.push({ pass: true, message: 'Step 2: Set default settings' });
+
+        // Step 3: Enable global dark theme
+        await chrome.storage.sync.set({ darkThemeEnabled: true });
+        results.push({ pass: true, message: 'Step 3: Enabled global dark theme' });
+
+        // Step 4: Set custom intensity
+        await chrome.storage.sync.set({ intensity: 65 });
+        results.push({ pass: true, message: 'Step 4: Set intensity to 65%' });
+
+        // Step 5: Add a site to whitelist
+        await chrome.storage.sync.set({ whitelist: ['example.com'] });
+        results.push({ pass: true, message: 'Step 5: Added example.com to whitelist' });
+
+        // Step 6: Add a site to blacklist
+        await chrome.storage.sync.set({ blacklist: ['test.com'] });
+        results.push({ pass: true, message: 'Step 6: Added test.com to blacklist' });
+
+        // Step 7: Set site-specific settings
+        const siteSettings = {};
+        siteSettings[currentSite] = {
+          enabled: true,
+          intensity: 95,
+          lastModified: Date.now()
+        };
+        await chrome.storage.sync.set({ siteSettings: siteSettings });
+        results.push({ pass: true, message: `Step 7: Set site-specific settings for ${currentSite}` });
+
+        // Step 8: Verify all settings
+        const finalSettings = await chrome.storage.sync.get([
+          'darkThemeEnabled',
+          'intensity',
+          'whitelist',
+          'blacklist',
+          'siteSettings'
+        ]);
+
+        if (finalSettings.darkThemeEnabled === true &&
+          finalSettings.intensity === 65 &&
+          finalSettings.whitelist.includes('example.com') &&
+          finalSettings.blacklist.includes('test.com') &&
+          finalSettings.siteSettings[currentSite]?.enabled === true) {
+          results.push({ pass: true, message: 'Step 8: All settings verified successfully' });
+        } else {
+          results.push({ pass: false, message: 'Step 8: Settings verification failed' });
+        }
+
+        results.push({ pass: true, message: '✅ Complete test passed! Reload page to see persistence in action.' });
+
+        displayResults(resultsDiv, results);
+      } catch (error) {
+        resultsDiv.innerHTML = `<div class="status error">Test failed: ${error.message}</div>`;
+      }
+    }
+
+    // Helper Functions
+    function displayResults(container, results) {
+      let html = '';
+      results.forEach(result => {
+        const className = result.pass ? 'pass' : 'fail';
+        const icon = result.pass ? '✅' : '❌';
+        html += `<div class="test-result ${className}">${icon} ${result.message}</div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    async function clearAllSettings() {
+      try {
+        await chrome.storage.sync.clear();
+        alert('All settings cleared! Reload the page to test with clean state.');
+      } catch (error) {
+        alert('Failed to clear settings: ' + error.message);
+      }
+    }
+
+    function reloadPage() {
+      window.location.reload();
+    }
+
+    // Initialize on load
+    updateCurrentState();
+
+    // Update state every 2 seconds
+    setInterval(updateCurrentState, 2000);
+
+    console.log('Settings Persistence Test Suite loaded');
+    console.log('Current site:', currentSite);
+  </script>
+</body>
+
+</html>

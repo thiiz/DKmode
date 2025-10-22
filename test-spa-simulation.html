@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPA Simulation Test - Dark Theme Extension</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: #ffffff;
+      color: #1a1a1a;
+    }
+
+    .app-container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #f8f9fa;
+      border-right: 1px solid #dee2e6;
+      padding: 20px;
+    }
+
+    .sidebar-item {
+      padding: 12px;
+      margin: 5px 0;
+      background-color: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .sidebar-item:hover {
+      background-color: #e9ecef;
+    }
+
+    .sidebar-item.active {
+      background-color: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 30px;
+      margin: -30px -30px 30px -30px;
+    }
+
+    .component-card {
+      background-color: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .dynamic-content {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-left: 4px solid #007bff;
+      margin: 15px 0;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-secondary {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .btn-success {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background-color: white;
+      border-radius: 8px;
+      padding: 30px;
+      max-width: 500px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .grid-item {
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .loading-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #007bff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #28a745;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 2000;
+    }
+
+    .toast.show {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      background-color: white;
+      color: #1a1a1a;
+    }
+
+    .image-gallery {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+
+    .gallery-image {
+      min-width: 200px;
+      height: 150px;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <h2 style="margin-bottom: 20px;">Navigation</h2>
+      <div class="sidebar-item active" data-view="dashboard">Dashboard</div>
+      <div class="sidebar-item" data-view="components">Components</div>
+      <div class="sidebar-item" data-view="forms">Forms</div>
+      <div class="sidebar-item" data-view="data">Data View</div>
+      <div class="sidebar-item" data-view="media">Media</div>
+    </aside>
+
+    <main class="main-content">
+      <div class="header">
+        <h1>SPA Simulation Test</h1>
+        <p>Testing dark theme on a simulated Single Page Application</p>
+      </div>
+
+      <div id="view-container">
+        <!-- Dynamic content will be loaded here -->
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <h2>Modal Dialog</h2>
+      <p>This modal tests overlay rendering with dark theme.</p>
+      <div class="button-group">
+        <button class="btn-primary" onclick="closeModal()">Close</button>
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Action completed successfully!</div>
+
+  <script>
+    // Simulate SPA routing and dynamic content
+    const views = {
+      dashboard: `
+                <div class="component-card">
+                    <h2>Dashboard View</h2>
+                    <p>This simulates a React/Vue/Angular dashboard component with dynamic content.</p>
+                    <div class="data-grid">
+                        <div class="grid-item">
+                            <h3>Users</h3>
+                            <p style="font-size: 24px; font-weight: bold; color: #007bff;">1,234</p>
+                        </div>
+                        <div class="grid-item">
+                            <h3>Revenue</h3>
+                            <p style="font-size: 24px; font-weight: bold; color: #28a745;">$45,678</p>
+                        </div>
+                        <div class="grid-item">
+                            <h3>Orders</h3>
+                            <p style="font-size: 24px; font-weight: bold; color: #ffc107;">567</p>
+                        </div>
+                        <div class="grid-item">
+                            <h3>Visitors</h3>
+                            <p style="font-size: 24px; font-weight: bold; color: #dc3545;">8,901</p>
+                        </div>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn-primary" onclick="showToast()">Show Toast</button>
+                        <button class="btn-secondary" onclick="openModal()">Open Modal</button>
+                        <button class="btn-success" onclick="loadDynamicContent()">Load Content</button>
+                    </div>
+                </div>
+            `,
+      components: `
+                <div class="component-card">
+                    <h2>Component Library</h2>
+                    <p>Testing various UI components with dark theme.</p>
+                    
+                    <h3>Buttons</h3>
+                    <div class="button-group">
+                        <button class="btn-primary">Primary</button>
+                        <button class="btn-secondary">Secondary</button>
+                        <button class="btn-success">Success</button>
+                    </div>
+                    
+                    <h3>Dynamic Content</h3>
+                    <div class="dynamic-content">
+                        <p>This content is dynamically rendered, simulating component updates in SPAs.</p>
+                        <p>Dark theme should apply correctly even when content changes.</p>
+                    </div>
+                    
+                    <h3>Loading State</h3>
+                    <div class="loading-spinner"></div>
+                </div>
+            `,
+      forms: `
+                <div class="component-card">
+                    <h2>Form Components</h2>
+                    <form onsubmit="event.preventDefault(); showToast();">
+                        <label>Text Input</label>
+                        <input type="text" placeholder="Enter text">
+                        
+                        <label>Email Input</label>
+                        <input type="email" placeholder="email@example.com">
+                        
+                        <label>Select Dropdown</label>
+                        <select>
+                            <option>Option 1</option>
+                            <option>Option 2</option>
+                            <option>Option 3</option>
+                        </select>
+                        
+                        <label>Textarea</label>
+                        <textarea rows="4" placeholder="Enter multiple lines"></textarea>
+                        
+                        <div class="button-group">
+                            <button type="submit" class="btn-primary">Submit</button>
+                            <button type="button" class="btn-secondary">Reset</button>
+                        </div>
+                    </form>
+                </div>
+            `,
+      data: `
+                <div class="component-card">
+                    <h2>Data Table View</h2>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: #f8f9fa;">
+                                <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">ID</th>
+                                <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Name</th>
+                                <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Status</th>
+                                <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #dee2e6;">1</td>
+                                <td style="padding: 12px; border: 1px solid #dee2e6;">Item One</td>
+                                <td style="padding: 12px; border: 1px solid #dee2e6;"><span style="background-color: #28a745; color: white; padding: 4px 8px; border-radius: 4px;">Active</span></td>
+                                <td style="padding: 12px; border: 1px solid #dee2e6;"><button class="btn-primary" style="padding: 6px 12px;">Edit</button></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #dee2e6;">2</td>
+                                <td style="padding: 12px; border: 1px solid #dee2e6;">Item Two</td>
+                                <td style="padding: 12px; border: 1px solid #dee2e6;"><span style="background-color: #ffc107; color: #1a1a1a; padding: 4px 8px; border-radius: 4px;">Pending</span></td>
+                                <td style="padding: 12px; border: 1px solid #dee2e6;"><button class="btn-primary" style="padding: 6px 12px;">Edit</button></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #dee2e6;">3</td>
+                                <td style="padding: 12px; border: 1px solid #dee2e6;">Item Three</td>
+                                <td style="padding: 12px; border: 1px solid #dee2e6;"><span style="background-color: #dc3545; color: white; padding: 4px 8px; border-radius: 4px;">Inactive</span></td>
+                                <td style="padding: 12px; border: 1px solid #dee2e6;"><button class="btn-primary" style="padding: 6px 12px;">Edit</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `,
+      media: `
+                <div class="component-card">
+                    <h2>Media Gallery</h2>
+                    <p>Images and media should not be over-inverted by the dark theme.</p>
+                    <div class="image-gallery">
+                        <div class="gallery-image">Image 1</div>
+                        <div class="gallery-image" style="background: linear-gradient(45deg, #f093fb, #f5576c);">Image 2</div>
+                        <div class="gallery-image" style="background: linear-gradient(45deg, #4facfe, #00f2fe);">Image 3</div>
+                        <div class="gallery-image" style="background: linear-gradient(45deg, #43e97b, #38f9d7);">Image 4</div>
+                    </div>
+                    
+                    <h3>SVG Graphics</h3>
+                    <svg width="300" height="150" style="border: 1px solid #dee2e6; border-radius: 4px;">
+                        <rect width="300" height="150" fill="#f8f9fa"/>
+                        <circle cx="75" cy="75" r="40" fill="#007bff"/>
+                        <rect x="150" y="35" width="80" height="80" fill="#28a745"/>
+                        <text x="150" y="20" font-family="Arial" font-size="16" fill="#1a1a1a">SVG Test</text>
+                    </svg>
+                </div>
+            `
+    };
+
+    function loadView(viewName) {
+      const container = document.getElementById('view-container');
+      container.innerHTML = views[viewName] || views.dashboard;
+
+      // Update active sidebar item
+      document.querySelectorAll('.sidebar-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.view === viewName) {
+          item.classList.add('active');
+        }
+      });
+    }
+
+    function openModal() {
+      document.getElementById('modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+    }
+
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function loadDynamicContent() {
+      const container = document.getElementById('view-container');
+      const newContent = document.createElement('div');
+      newContent.className = 'component-card';
+      newContent.innerHTML = `
+                <h3>Dynamically Loaded Content</h3>
+                <p>This content was added after page load, simulating SPA behavior.</p>
+                <p>Dark theme should apply to this new content automatically.</p>
+                <p>Timestamp: ${new Date().toLocaleTimeString()}</p>
+            `;
+      container.appendChild(newContent);
+      showToast();
+    }
+
+    // Set up navigation
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+      item.addEventListener('click', () => {
+        loadView(item.dataset.view);
+      });
+    });
+
+    // Load initial view
+    loadView('dashboard');
+
+    console.log('SPA simulation test page loaded');
+    console.log('Test features:');
+    console.log('- Dynamic content loading');
+    console.log('- Modal overlays');
+    console.log('- Toast notifications');
+    console.log('- Multiple view routing');
+    console.log('- Form components');
+    console.log('- Data tables');
+    console.log('- Media galleries');
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Current Site Info Component</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .test-container {
+      max-width: 400px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .test-section {
+      margin-bottom: 30px;
+    }
+
+    .test-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    /* Current Site Info Component Styles */
+    .current-site-info {
+      margin-bottom: 20px;
+      padding: 12px;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      transition: background-color 0.2s ease;
+    }
+
+    .current-site-info:hover {
+      background-color: #f0f0f0;
+    }
+
+    .site-info-header {
+      margin-bottom: 8px;
+    }
+
+    .site-info-label {
+      font-size: 11px;
+      color: #999999;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .site-info-main {
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .site-hostname {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333333;
+      word-break: break-all;
+      flex: 1;
+    }
+
+    .site-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      background-color: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      transition: all 0.2s ease;
+    }
+
+    .site-status-badge.active {
+      background-color: #e8f5e9;
+      border-color: #4CAF50;
+    }
+
+    .status-indicator-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #999999;
+      transition: background-color 0.2s ease;
+    }
+
+    .status-indicator-dot.active {
+      background-color: #4CAF50;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.6;
+      }
+    }
+
+    .status-badge-text {
+      font-size: 11px;
+      font-weight: 600;
+      color: #666666;
+    }
+
+    .status-badge-text.active {
+      color: #2e7d32;
+    }
+
+    .site-info-details {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+    }
+
+    .site-info-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .site-info-item-label {
+      color: #666666;
+    }
+
+    .site-info-item-value {
+      font-weight: 600;
+      color: #333333;
+    }
+
+    .site-info-item-value.active {
+      color: #4CAF50;
+    }
+
+    .site-list-description {
+      font-size: 11px;
+      color: #666666;
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="test-container">
+    <h1>Current Site Info Component Test</h1>
+
+    <div class="test-section">
+      <div class="test-label">Test 1: Dark Theme Enabled (example.com, 80% intensity)</div>
+      <div class="current-site-info">
+        <div class="site-info-header">
+          <span class="site-info-label">Current Site</span>
+        </div>
+        <div class="site-info-main">
+          <span class="site-hostname">example.com</span>
+          <div class="site-status-badge active">
+            <span class="status-indicator-dot active"></span>
+            <span class="status-badge-text active">ON</span>
+          </div>
+        </div>
+        <div class="site-info-details">
+          <div class="site-info-item">
+            <span class="site-info-item-label">Status: </span>
+            <span class="site-info-item-value active">Active</span>
+          </div>
+          <div class="site-info-item">
+            <span class="site-info-item-label">Intensity: </span>
+            <span class="site-info-item-value">80%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <div class="test-label">Test 2: Dark Theme Disabled (github.com, 50% intensity)</div>
+      <div class="current-site-info">
+        <div class="site-info-header">
+          <span class="site-info-label">Current Site</span>
+        </div>
+        <div class="site-info-main">
+          <span class="site-hostname">github.com</span>
+          <div class="site-status-badge">
+            <span class="status-indicator-dot"></span>
+            <span class="status-badge-text">OFF</span>
+          </div>
+        </div>
+        <div class="site-info-details">
+          <div class="site-info-item">
+            <span class="site-info-item-label">Status: </span>
+            <span class="site-info-item-value">Inactive</span>
+          </div>
+          <div class="site-info-item">
+            <span class="site-info-item-label">Intensity: </span>
+            <span class="site-info-item-value">50%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <div class="test-label">Test 3: No Active Site</div>
+      <div class="current-site-info">
+        <p class="site-list-description">No active site detected</p>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <div class="test-label">Test 4: Long Hostname (very-long-subdomain.example-website.com)</div>
+      <div class="current-site-info">
+        <div class="site-info-header">
+          <span class="site-info-label">Current Site</span>
+        </div>
+        <div class="site-info-main">
+          <span class="site-hostname">very-long-subdomain.example-website.com</span>
+          <div class="site-status-badge active">
+            <span class="status-indicator-dot active"></span>
+            <span class="status-badge-text active">ON</span>
+          </div>
+        </div>
+        <div class="site-info-details">
+          <div class="site-info-item">
+            <span class="site-info-item-label">Status: </span>
+            <span class="site-info-item-value active">Active</span>
+          </div>
+          <div class="site-info-item">
+            <span class="site-info-item-label">Intensity: </span>
+            <span class="site-info-item-value">100%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

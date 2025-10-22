@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dark Theme CSS Test</title>
+  <link rel="stylesheet" href="src/content/content.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .controls {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: white;
+      padding: 15px;
+      border: 2px solid #333;
+      border-radius: 8px;
+      z-index: 10000;
+    }
+
+    .test-section {
+      margin: 30px 0;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="controls">
+    <h3>Dark Theme Controls</h3>
+    <button onclick="toggleDarkTheme()">Toggle Dark Theme</button>
+    <br><br>
+    <label for="intensity">Intensity: <span id="intensity-value">80</span>%</label>
+    <br>
+    <input type="range" id="intensity" min="0" max="100" value="80" oninput="updateIntensity(this.value)">
+  </div>
+
+  <h1>Dark Theme CSS Test Page</h1>
+  <p>This page tests the dark theme CSS styles with various HTML elements.</p>
+
+  <div class="test-section">
+    <h2>Text and Headings</h2>
+    <h3>Heading 3</h3>
+    <h4>Heading 4</h4>
+    <p>Regular paragraph text with <strong>bold</strong>, <em>italic</em>, and <u>underlined</u> text.</p>
+    <blockquote>This is a blockquote element to test styling.</blockquote>
+  </div>
+
+  <div class="test-section">
+    <h2>Links</h2>
+    <p>
+      <a href="#">Regular Link</a> |
+      <a href="#" style="color: purple;">Visited Link (simulated)</a> |
+      <a href="#" onmouseover="this.style.textDecoration='underline'">Hover Link</a>
+    </p>
+  </div>
+
+  <div class="test-section">
+    <h2>Form Elements</h2>
+    <form>
+      <label for="text-input">Text Input:</label><br>
+      <input type="text" id="text-input" placeholder="Enter text here"><br><br>
+
+      <label for="textarea">Textarea:</label><br>
+      <textarea id="textarea" rows="4" cols="50" placeholder="Enter multiple lines"></textarea><br><br>
+
+      <label for="select">Select:</label><br>
+      <select id="select">
+        <option>Option 1</option>
+        <option>Option 2</option>
+        <option>Option 3</option>
+      </select><br><br>
+
+      <label>
+        <input type="checkbox" id="checkbox"> Checkbox
+      </label><br>
+
+      <label>
+        <input type="radio" name="radio" value="1"> Radio 1
+      </label>
+      <label>
+        <input type="radio" name="radio" value="2"> Radio 2
+      </label><br><br>
+
+      <button type="button">Regular Button</button>
+      <button type="submit">Submit Button</button>
+    </form>
+  </div>
+
+  <div class="test-section">
+    <h2>Table</h2>
+    <table border="1" cellpadding="10">
+      <thead>
+        <tr>
+          <th>Header 1</th>
+          <th>Header 2</th>
+          <th>Header 3</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Row 1, Cell 1</td>
+          <td>Row 1, Cell 2</td>
+          <td>Row 1, Cell 3</td>
+        </tr>
+        <tr>
+          <td>Row 2, Cell 1</td>
+          <td>Row 2, Cell 2</td>
+          <td>Row 2, Cell 3</td>
+        </tr>
+        <tr>
+          <td>Row 3, Cell 1</td>
+          <td>Row 3, Cell 2</td>
+          <td>Row 3, Cell 3</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="test-section">
+    <h2>Code Elements</h2>
+    <p>Inline code: <code>const x = 10;</code></p>
+    <pre><code>function example() {
+  console.log("Hello, World!");
+  return true;
+}</code></pre>
+  </div>
+
+  <div class="test-section">
+    <h2>Media Elements</h2>
+    <h3>Images</h3>
+    <img src="https://via.placeholder.com/300x200/4A90E2/FFFFFF?text=Test+Image" alt="Test Image"
+      style="max-width: 300px;">
+
+    <h3>Canvas</h3>
+    <canvas id="test-canvas" width="300" height="100" style="border: 1px solid #000;"></canvas>
+  </div>
+
+  <div class="test-section">
+    <h2>Other Elements</h2>
+    <hr>
+    <fieldset>
+      <legend>Fieldset Legend</legend>
+      <p>Content inside a fieldset</p>
+    </fieldset>
+  </div>
+
+  <script>
+    // Draw something on canvas
+    const canvas = document.getElementById('test-canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#4A90E2';
+    ctx.fillRect(10, 10, 280, 80);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '20px Arial';
+    ctx.fillText('Canvas Element Test', 60, 55);
+
+    // Toggle dark theme
+    function toggleDarkTheme() {
+      document.documentElement.classList.toggle('dark-theme-active');
+    }
+
+    // Update intensity
+    function updateIntensity(value) {
+      document.getElementById('intensity-value').textContent = value;
+      document.documentElement.style.setProperty('--dark-theme-intensity', value / 100);
+    }
+  </script>
+</body>
+
+</html>

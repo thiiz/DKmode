@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cross-Tab Synchronization Test - Dark Theme Extension</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header h1 {
+      margin: 0 0 10px 0;
+    }
+
+    .header p {
+      margin: 0;
+      opacity: 0.9;
+    }
+
+    .test-section {
+      background: white;
+      padding: 25px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .test-section h2 {
+      margin-top: 0;
+      color: #333;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    .instructions {
+      background: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+
+    .instructions h3 {
+      margin-top: 0;
+      color: #1976d2;
+    }
+
+    .instructions ol {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+
+    .instructions li {
+      margin: 8px 0;
+    }
+
+    .status-indicator {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .status-active {
+      background: #4caf50;
+      color: white;
+    }
+
+    .status-inactive {
+      background: #f44336;
+      color: white;
+    }
+
+    .status-unknown {
+      background: #ff9800;
+      color: white;
+    }
+
+    .test-content {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 5px;
+      margin: 15px 0;
+    }
+
+    .test-content h3 {
+      color: #555;
+      margin-top: 0;
+    }
+
+    .test-content p {
+      line-height: 1.6;
+      color: #666;
+    }
+
+    .button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 5px;
+      transition: background 0.3s;
+    }
+
+    .button:hover {
+      background: #5568d3;
+    }
+
+    .button:active {
+      transform: scale(0.98);
+    }
+
+    .info-box {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+    }
+
+    .success-box {
+      background: #d4edda;
+      border: 1px solid #28a745;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 15px 0;
+    }
+
+    .code {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 15px;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      overflow-x: auto;
+      margin: 10px 0;
+    }
+
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .test-card {
+      background: #f5f5f5;
+      padding: 20px;
+      border-radius: 8px;
+      border: 2px solid #ddd;
+    }
+
+    .test-card h4 {
+      margin-top: 0;
+      color: #667eea;
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+    }
+
+    .checklist li {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .checklist li:before {
+      content: "☐ ";
+      color: #667eea;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    #currentStatus {
+      font-size: 18px;
+      font-weight: bold;
+      padding: 15px;
+      background: #f5f5f5;
+      border-radius: 5px;
+      margin: 15px 0;
+    }
+
+    .highlight {
+      background: yellow;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1>🔄 Cross-Tab Synchronization Test</h1>
+    <p>Test the real-time synchronization of dark theme settings across multiple browser tabs</p>
+  </div>
+
+  <div class="test-section">
+    <h2>📋 Test Overview</h2>
+    <p>
+      This test page verifies that the Dark Theme Extension properly synchronizes settings across multiple tabs in
+      real-time.
+      When you change settings in one tab (via the extension popup), all other tabs should automatically update to
+      reflect those changes.
+    </p>
+
+    <div class="info-box">
+      <strong>⚠️ Important:</strong> To properly test cross-tab synchronization, you need to:
+      <ul>
+        <li>Open this page in <strong>at least 2 browser tabs</strong></li>
+        <li>Keep both tabs visible (side-by-side if possible)</li>
+        <li>Make changes using the extension popup in one tab</li>
+        <li>Observe the changes automatically apply in the other tab(s)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>🎯 Current Theme Status</h2>
+    <div id="currentStatus">
+      <div>Theme Status: <span id="themeStatus" class="status-indicator status-unknown">Checking...</span></div>
+      <div style="margin-top: 10px;">Intensity: <span id="intensityValue">--</span>%</div>
+      <div style="margin-top: 10px;">Last Updated: <span id="lastUpdate">Never</span></div>
+    </div>
+
+    <button class="button" onclick="checkStatus()">🔄 Refresh Status</button>
+  </div>
+
+  <div class="test-section">
+    <h2>🧪 Test Procedures</h2>
+
+    <div class="instructions">
+      <h3>Test 1: Basic Cross-Tab Toggle Synchronization</h3>
+      <ol>
+        <li>Open this page in <strong>Tab A</strong> (current tab)</li>
+        <li>Open this page in <strong>Tab B</strong> (duplicate this tab)</li>
+        <li>Arrange both tabs side-by-side so you can see both</li>
+        <li>In <strong>Tab A</strong>, click the extension icon and toggle dark theme <strong>ON</strong></li>
+        <li><strong>Expected:</strong> Both Tab A and Tab B should turn dark simultaneously</li>
+        <li>In <strong>Tab B</strong>, click the extension icon and toggle dark theme <strong>OFF</strong></li>
+        <li><strong>Expected:</strong> Both tabs should return to light theme simultaneously</li>
+      </ol>
+    </div>
+
+    <div class="instructions">
+      <h3>Test 2: Intensity Synchronization</h3>
+      <ol>
+        <li>Ensure dark theme is <strong>enabled</strong> in both tabs</li>
+        <li>In <strong>Tab A</strong>, open the extension popup</li>
+        <li>Adjust the intensity slider to <strong>30%</strong></li>
+        <li><strong>Expected:</strong> Both tabs should become lighter immediately</li>
+        <li>In <strong>Tab B</strong>, adjust the intensity slider to <strong>100%</strong></li>
+        <li><strong>Expected:</strong> Both tabs should become much darker immediately</li>
+        <li>Try various intensity values and observe synchronization</li>
+      </ol>
+    </div>
+
+    <div class="instructions">
+      <h3>Test 3: Whitelist/Blacklist Synchronization</h3>
+      <ol>
+        <li>Note the current hostname: <strong id="hostname">--</strong></li>
+        <li>In <strong>Tab A</strong>, add this site to the <strong>blacklist</strong></li>
+        <li><strong>Expected:</strong> Dark theme should be removed from both tabs immediately</li>
+        <li>Remove this site from the blacklist</li>
+        <li>Add this site to the <strong>whitelist</strong></li>
+        <li><strong>Expected:</strong> Dark theme should be applied to both tabs (even if globally disabled)</li>
+        <li>Verify the status indicator updates in both tabs</li>
+      </ol>
+    </div>
+
+    <div class="instructions">
+      <h3>Test 4: Multiple Tabs Synchronization</h3>
+      <ol>
+        <li>Open this page in <strong>3 or more tabs</strong></li>
+        <li>Make changes in any one tab</li>
+        <li><strong>Expected:</strong> All tabs should update simultaneously</li>
+        <li>Try toggling, changing intensity, and managing lists</li>
+        <li>Verify all tabs stay in sync regardless of which tab makes changes</li>
+      </ol>
+    </div>
+
+    <div class="instructions">
+      <h3>Test 5: Storage Event Listener Test</h3>
+      <ol>
+        <li>Open browser DevTools (F12) in both tabs</li>
+        <li>Go to the Console tab</li>
+        <li>Make changes in one tab's extension popup</li>
+        <li><strong>Expected:</strong> See console logs in both tabs showing:
+          <ul>
+            <li>"[Dark Theme Extension] Storage changed, syncing theme state"</li>
+            <li>"[Dark Theme Extension] Applied/Removed theme due to settings update from another tab"</li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>✅ Verification Checklist</h2>
+    <ul class="checklist">
+      <li>Theme toggles synchronize across all tabs instantly</li>
+      <li>Intensity changes synchronize across all tabs in real-time</li>
+      <li>Whitelist additions/removals synchronize across tabs</li>
+      <li>Blacklist additions/removals synchronize across tabs</li>
+      <li>Console logs show storage change events in all tabs</li>
+      <li>No errors appear in the console during synchronization</li>
+      <li>Theme state remains consistent across all tabs</li>
+      <li>Changes persist after closing and reopening tabs</li>
+      <li>Synchronization works with 3+ tabs open simultaneously</li>
+      <li>Status indicator updates correctly in all tabs</li>
+    </ul>
+  </div>
+
+  <div class="test-section">
+    <h2>🔍 Technical Details</h2>
+
+    <div class="test-grid">
+      <div class="test-card">
+        <h4>Content Script Listeners</h4>
+        <p>The content script listens for:</p>
+        <ul>
+          <li><code>chrome.storage.onChanged</code> - Direct storage events</li>
+          <li><code>chrome.runtime.onMessage</code> - SETTINGS_UPDATED messages</li>
+        </ul>
+      </div>
+
+      <div class="test-card">
+        <h4>Background Script Role</h4>
+        <p>The background script:</p>
+        <ul>
+          <li>Listens for storage changes</li>
+          <li>Broadcasts SETTINGS_UPDATED to all tabs</li>
+          <li>Filters out restricted URLs (chrome://)</li>
+        </ul>
+      </div>
+
+      <div class="test-card">
+        <h4>Synchronization Flow</h4>
+        <p>When settings change:</p>
+        <ol style="padding-left: 20px; font-size: 14px;">
+          <li>Popup saves to chrome.storage.sync</li>
+          <li>Storage change event fires</li>
+          <li>Background script broadcasts to all tabs</li>
+          <li>Content scripts receive and apply changes</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>📝 Test Content</h2>
+    <div class="test-content">
+      <h3>Sample Content for Visual Testing</h3>
+      <p>
+        This section contains various HTML elements to help you visually verify that the dark theme
+        is being applied and synchronized correctly across tabs. Watch this content as you make changes
+        in other tabs.
+      </p>
+
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+        labore et dolore magna aliqua. <span class="highlight">This text is highlighted</span> to test
+        color handling.
+      </p>
+
+      <button class="button">Sample Button</button>
+      <button class="button" style="background: #f44336;">Red Button</button>
+      <button class="button" style="background: #4caf50;">Green Button</button>
+
+      <div style="margin-top: 20px;">
+        <input type="text" placeholder="Text input" style="padding: 8px; margin: 5px;">
+        <input type="email" placeholder="Email input" style="padding: 8px; margin: 5px;">
+      </div>
+
+      <div style="margin-top: 20px;">
+        <a href="#test1">Sample Link 1</a> |
+        <a href="#test2">Sample Link 2</a> |
+        <a href="#test3">Sample Link 3</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>🐛 Troubleshooting</h2>
+
+    <div class="info-box">
+      <strong>If synchronization is not working:</strong>
+      <ul>
+        <li>Check that the extension is loaded and active</li>
+        <li>Open DevTools Console (F12) and look for error messages</li>
+        <li>Verify the background service worker is running (chrome://extensions)</li>
+        <li>Try reloading the extension</li>
+        <li>Ensure both tabs are on the same domain</li>
+        <li>Check that chrome.storage.sync is not disabled</li>
+      </ul>
+    </div>
+
+    <div class="success-box">
+      <strong>✅ If everything works correctly, you should see:</strong>
+      <ul>
+        <li>Instant visual updates in all tabs when settings change</li>
+        <li>Console logs confirming storage events and theme updates</li>
+        <li>Consistent theme state across all tabs at all times</li>
+        <li>No errors or warnings in the console</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Display current hostname
+    document.getElementById('hostname').textContent = window.location.hostname;
+
+    // Function to check and display current theme status
+    function checkStatus() {
+      const isActive = document.documentElement.classList.contains('dark-theme-active');
+      const intensity = document.documentElement.style.getPropertyValue('--dark-theme-intensity');
+      const intensityPercent = intensity ? Math.round(parseFloat(intensity) * 100) : 0;
+
+      const statusElement = document.getElementById('themeStatus');
+      const intensityElement = document.getElementById('intensityValue');
+      const lastUpdateElement = document.getElementById('lastUpdate');
+
+      if (isActive) {
+        statusElement.textContent = 'Active';
+        statusElement.className = 'status-indicator status-active';
+      } else {
+        statusElement.textContent = 'Inactive';
+        statusElement.className = 'status-indicator status-inactive';
+      }
+
+      intensityElement.textContent = intensityPercent;
+      lastUpdateElement.textContent = new Date().toLocaleTimeString();
+    }
+
+    // Check status on page load
+    checkStatus();
+
+    // Auto-refresh status every 2 seconds
+    setInterval(checkStatus, 2000);
+
+    // Listen for class changes on documentElement to detect theme changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class' || mutation.attributeName === 'style') {
+          checkStatus();
+          console.log('[Test Page] Theme state changed, status updated');
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class', 'style']
+    });
+
+    console.log('[Test Page] Cross-tab synchronization test page loaded');
+    console.log('[Test Page] Current hostname:', window.location.hostname);
+    console.log('[Test Page] Monitoring for theme changes...');
+  </script>
+</body>
+
+</html>

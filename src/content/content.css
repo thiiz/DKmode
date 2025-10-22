@@ -1,0 +1,169 @@
+/* Dark Theme Extension - Content Styles */
+
+/* CSS Custom Properties for Dynamic Intensity Control */
+:root {
+  --dark-theme-intensity: 0.8;
+  --dark-bg: hsl(0, 0%, calc(10% * var(--dark-theme-intensity)));
+  --dark-text: hsl(0, 0%, calc(90% + (10% * (1 - var(--dark-theme-intensity)))));
+  --dark-border: hsl(0, 0%, calc(30% * var(--dark-theme-intensity)));
+}
+
+/* Base Dark Theme Styles */
+.dark-theme-active {
+  background-color: var(--dark-bg) !important;
+  color: var(--dark-text) !important;
+}
+
+/* Apply dark theme to all elements except media */
+.dark-theme-active *:not(img):not(video):not(canvas):not(svg) {
+  background-color: var(--dark-bg) !important;
+  color: var(--dark-text) !important;
+  border-color: var(--dark-border) !important;
+}
+
+/* Input Elements Styling */
+.dark-theme-active input,
+.dark-theme-active textarea,
+.dark-theme-active select {
+  background-color: hsl(0, 0%, 15%) !important;
+  color: var(--dark-text) !important;
+  border: 1px solid var(--dark-border) !important;
+}
+
+.dark-theme-active input::placeholder,
+.dark-theme-active textarea::placeholder {
+  color: hsl(0, 0%, 60%) !important;
+  opacity: 0.7 !important;
+}
+
+.dark-theme-active input:focus,
+.dark-theme-active textarea:focus,
+.dark-theme-active select:focus {
+  outline-color: hsl(210, 100%, 60%) !important;
+  border-color: hsl(210, 100%, 60%) !important;
+}
+
+/* Checkbox and Radio Inputs */
+.dark-theme-active input[type="checkbox"],
+.dark-theme-active input[type="radio"] {
+  background-color: hsl(0, 0%, 20%) !important;
+  border: 1px solid var(--dark-border) !important;
+}
+
+/* Link Styling */
+.dark-theme-active a {
+  color: hsl(210, 100%, 70%) !important;
+}
+
+.dark-theme-active a:visited {
+  color: hsl(270, 100%, 70%) !important;
+}
+
+.dark-theme-active a:hover {
+  color: hsl(210, 100%, 80%) !important;
+}
+
+/* Button Styling */
+.dark-theme-active button,
+.dark-theme-active input[type="button"],
+.dark-theme-active input[type="submit"],
+.dark-theme-active input[type="reset"] {
+  background-color: hsl(0, 0%, 20%) !important;
+  color: var(--dark-text) !important;
+  border: 1px solid var(--dark-border) !important;
+}
+
+.dark-theme-active button:hover,
+.dark-theme-active input[type="button"]:hover,
+.dark-theme-active input[type="submit"]:hover,
+.dark-theme-active input[type="reset"]:hover {
+  background-color: hsl(0, 0%, 25%) !important;
+}
+
+/* Media Element Protection - Prevent Over-Inversion */
+.dark-theme-active img,
+.dark-theme-active video,
+.dark-theme-active canvas {
+  filter: brightness(calc(0.8 + (0.2 * (1 - var(--dark-theme-intensity))))) !important;
+}
+
+/* SVG Elements */
+.dark-theme-active svg {
+  filter: invert(calc(var(--dark-theme-intensity))) !important;
+}
+
+/* Code Blocks */
+.dark-theme-active pre,
+.dark-theme-active code {
+  background-color: hsl(0, 0%, 12%) !important;
+  color: hsl(120, 100%, 75%) !important;
+  border: 1px solid var(--dark-border) !important;
+}
+
+/* Tables */
+.dark-theme-active table {
+  border-color: var(--dark-border) !important;
+}
+
+.dark-theme-active th,
+.dark-theme-active td {
+  background-color: hsl(0, 0%, 15%) !important;
+  border-color: var(--dark-border) !important;
+}
+
+.dark-theme-active tr:nth-child(even) td {
+  background-color: hsl(0, 0%, 18%) !important;
+}
+
+/* Headings */
+.dark-theme-active h1,
+.dark-theme-active h2,
+.dark-theme-active h3,
+.dark-theme-active h4,
+.dark-theme-active h5,
+.dark-theme-active h6 {
+  color: var(--dark-text) !important;
+}
+
+/* Lists */
+.dark-theme-active ul,
+.dark-theme-active ol {
+  color: var(--dark-text) !important;
+}
+
+/* Blockquotes */
+.dark-theme-active blockquote {
+  background-color: hsl(0, 0%, 15%) !important;
+  border-left-color: hsl(210, 100%, 60%) !important;
+  color: var(--dark-text) !important;
+}
+
+/* HR Elements */
+.dark-theme-active hr {
+  border-color: var(--dark-border) !important;
+}
+
+/* Selection */
+.dark-theme-active ::selection {
+  background-color: hsl(210, 100%, 40%) !important;
+  color: white !important;
+}
+
+.dark-theme-active ::-moz-selection {
+  background-color: hsl(210, 100%, 40%) !important;
+  color: white !important;
+}
+
+/* Scrollbar Styling (Webkit browsers) */
+.dark-theme-active ::-webkit-scrollbar {
+  background-color: var(--dark-bg) !important;
+}
+
+.dark-theme-active ::-webkit-scrollbar-thumb {
+  background-color: hsl(0, 0%, 40%) !important;
+  border-radius: 4px !important;
+}
+
+.dark-theme-active ::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(0, 0%, 50%) !important;
+}
