@@ -3,9 +3,9 @@
 /* CSS Custom Properties for Dynamic Intensity Control */
 :root {
   --dark-theme-intensity: 0.8;
-  --dark-bg: hsl(0, 0%, calc(10% * var(--dark-theme-intensity)));
-  --dark-text: hsl(0, 0%, calc(90% + (10% * (1 - var(--dark-theme-intensity)))));
-  --dark-border: hsl(0, 0%, calc(30% * var(--dark-theme-intensity)));
+  --dark-bg: hsl(0, 0%, calc(5% + (10% * (1 - var(--dark-theme-intensity)))));
+  --dark-text: hsl(0, 0%, calc(85% + (10% * var(--dark-theme-intensity))));
+  --dark-border: hsl(0, 0%, calc(20% + (20% * (1 - var(--dark-theme-intensity)))));
 }
 
 /* Base Dark Theme Styles */
