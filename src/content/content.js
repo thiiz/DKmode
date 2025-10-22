@@ -5,9 +5,8 @@
 
 // In-memory fallback settings when storage is unavailable
 const fallbackSettings = {
-  darkThemeEnabled: false,
+  darkThemeEnabled: true, // Enabled by default
   intensity: 80,
-  whitelist: [],
   blacklist: [],
   siteSettings: {}
 };
@@ -159,7 +158,6 @@ async function initDarkTheme() {
     const settings = await getSettingsSafely([
       'darkThemeEnabled',
       'intensity',
-      'whitelist',
       'blacklist',
       'siteSettings'
     ]);
@@ -260,12 +258,6 @@ function determineShouldApply(site, settings) {
       return false;
     }
 
-    // Check whitelist
-    if (Array.isArray(settings.whitelist) && settings.whitelist.includes(site)) {
-      console.log(`[Dark Theme Extension] Site ${site} is whitelisted - dark theme WILL be applied`);
-      return true;
-    }
-
     // Check site-specific settings
     if (settings.siteSettings?.[site]?.enabled !== undefined) {
       const enabled = settings.siteSettings[site].enabled;
@@ -273,8 +265,8 @@ function determineShouldApply(site, settings) {
       return enabled;
     }
 
-    // Default to global setting
-    const globalEnabled = settings.darkThemeEnabled || false;
+    // Default to global setting (enabled by default)
+    const globalEnabled = settings.darkThemeEnabled !== undefined ? settings.darkThemeEnabled : true;
     console.log(`[Dark Theme Extension] Using global setting for ${site}: ${globalEnabled ? 'enabled' : 'disabled'}`);
     return globalEnabled;
   } catch (error) {
@@ -316,7 +308,6 @@ async function handleSettingsUpdate(changes) {
     const settings = await getSettingsSafely([
       'darkThemeEnabled',
       'intensity',
-      'whitelist',
       'blacklist',
       'siteSettings'
     ]);

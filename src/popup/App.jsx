@@ -30,10 +30,9 @@ function isRestrictedUrl(url) {
 
 export function App() {
   // State management
-  const [darkThemeEnabled, setDarkThemeEnabled] = useState(false);
+  const [darkThemeEnabled, setDarkThemeEnabled] = useState(true); // Enabled by default
   const [intensity, setIntensity] = useState(80);
   const [currentSite, setCurrentSite] = useState('');
-  const [whitelist, setWhitelist] = useState([]);
   const [blacklist, setBlacklist] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -46,22 +45,19 @@ export function App() {
         const settings = await chrome.storage.sync.get([
           'darkThemeEnabled',
           'intensity',
-          'whitelist',
           'blacklist'
         ]);
 
-        setDarkThemeEnabled(settings.darkThemeEnabled || false);
+        setDarkThemeEnabled(settings.darkThemeEnabled !== undefined ? settings.darkThemeEnabled : true);
         setIntensity(settings.intensity || 80);
-        setWhitelist(settings.whitelist || []);
         setBlacklist(settings.blacklist || []);
       } catch (error) {
         console.error('Failed to load settings:', error);
         setError('Failed to load settings. Using default values.');
 
         // Use default values on error
-        setDarkThemeEnabled(false);
+        setDarkThemeEnabled(true);
         setIntensity(80);
-        setWhitelist([]);
         setBlacklist([]);
       } finally {
         setLoading(false);
@@ -191,97 +187,7 @@ export function App() {
     }
   };
 
-  /**
-   * Handle whitelist changes (both add and remove operations)
-   * @param {string[]} newWhitelist - Updated whitelist array
-   */
-  const handleWhitelistChange = async (newWhitelist) => {
-    try {
-      // Clear any previous messages
-      setError(null);
-      setSuccess(null);
 
-      // Determine if this is an add or remove operation
-      const isAddOperation = newWhitelist.length > whitelist.length;
-
-      if (isAddOperation) {
-        // Site was added to whitelist
-        const addedSite = newWhitelist.find(site => !whitelist.includes(site));
-
-        // Update local state
-        setWhitelist(newWhitelist);
-
-        // Save to chrome.storage.sync
-        await chrome.storage.sync.set({ whitelist: newWhitelist });
-
-        // Check if the newly added site is the current site
-        if (addedSite === currentSite) {
-          // Apply theme immediately if the current site was just whitelisted
-          await sendMessageToContentScript({
-            type: 'TOGGLE_DARK_THEME',
-            enabled: true,
-            site: currentSite,
-            intensity: intensity
-          });
-
-          setSuccess(`${currentSite} added to whitelist and dark theme applied`);
-        } else {
-          setSuccess(`${addedSite} added to whitelist`);
-        }
-      } else {
-        // Site was removed from whitelist
-        const removedSite = whitelist.find(site => !newWhitelist.includes(site));
-
-        // Update local state
-        setWhitelist(newWhitelist);
-
-        // Save to chrome.storage.sync
-        await chrome.storage.sync.set({ whitelist: newWhitelist });
-
-        // Check if the removed site is the current site
-        if (removedSite === currentSite) {
-          // Re-evaluate if theme should still be applied based on global settings
-          if (!darkThemeEnabled && !blacklist.includes(currentSite)) {
-            // Remove theme if global setting is off and site is not blacklisted
-            await sendMessageToContentScript({
-              type: 'TOGGLE_DARK_THEME',
-              enabled: false,
-              site: currentSite,
-              intensity: intensity
-            });
-
-            setSuccess(`${currentSite} removed from whitelist and dark theme disabled`);
-          } else {
-            setSuccess(`${currentSite} removed from whitelist`);
-          }
-        } else {
-          setSuccess(`${removedSite} removed from whitelist`);
-        }
-      }
-
-      // Clear success message after 2 seconds
-      setTimeout(() => setSuccess(null), 2000);
-    } catch (error) {
-      console.error('Failed to update whitelist:', error);
-
-      // Revert local state on error
-      setWhitelist(whitelist);
-
-      // Set error message based on error type
-      if (error.message.includes('Cannot run extension on this page')) {
-        setError('Cannot apply theme to this page type.');
-      } else if (error.message.includes('Content script not loaded')) {
-        setError('Content script not loaded. Try refreshing the page.');
-      } else if (error.message.includes('QUOTA_BYTES')) {
-        setError('Storage quota exceeded. Cannot add more sites to whitelist.');
-      } else {
-        setError('Failed to update whitelist. Please try again.');
-      }
-
-      // Clear error message after 5 seconds
-      setTimeout(() => setError(null), 5000);
-    }
-  };
 
   /**
    * Handle blacklist changes (both add and remove operations)
@@ -332,9 +238,9 @@ export function App() {
 
         // Check if the removed site is the current site
         if (removedSite === currentSite) {
-          // Re-evaluate if theme should be applied based on global settings or whitelist
-          if (darkThemeEnabled || whitelist.includes(currentSite)) {
-            // Apply theme if global setting is on or site is whitelisted
+          // Re-evaluate if theme should be applied based on global settings
+          if (darkThemeEnabled) {
+            // Apply theme if global setting is on
             await sendMessageToContentScript({
               type: 'TOGGLE_DARK_THEME',
               enabled: true,
@@ -420,9 +326,7 @@ export function App() {
       />
 
       <SiteListManager
-        whitelist={whitelist}
         blacklist={blacklist}
-        onWhitelistChange={handleWhitelistChange}
         onBlacklistChange={handleBlacklistChange}
         currentSite={currentSite}
       />

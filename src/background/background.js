@@ -2,9 +2,8 @@
 
 // Default settings for new installations
 const DEFAULT_SETTINGS = {
-  darkThemeEnabled: false,
+  darkThemeEnabled: true, // Enabled by default
   intensity: 80,
-  whitelist: [],
   blacklist: [],
   siteSettings: {}
 };

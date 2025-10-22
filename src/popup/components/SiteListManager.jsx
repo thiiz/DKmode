@@ -1,18 +1,14 @@
 import { SiteList } from './SiteList';
 
-export function SiteListManager({ whitelist, blacklist, onWhitelistChange, onBlacklistChange, currentSite }) {
+export function SiteListManager({ blacklist, onBlacklistChange, currentSite }) {
   return (
     <div className="site-list-manager">
       <h2 className="site-list-manager-title">
-        Site Management
+        Blacklisted Sites
       </h2>
-
-      <SiteList
-        type="whitelist"
-        sites={whitelist}
-        onSitesChange={onWhitelistChange}
-        currentSite={currentSite}
-      />
+      <p className="site-list-description">
+        Sites in the blacklist will never have the dark theme applied, even when globally enabled.
+      </p>
 
       <SiteList
         type="blacklist"
