@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Whitelist & Blacklist Functionality Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .test-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+    }
+
+    .test-section {
+      background: white;
+      padding: 25px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .test-section h2 {
+      color: #667eea;
+      margin-top: 0;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+
+    .test-step {
+      background: #f8f9fa;
+      padding: 15px;
+      margin: 15px 0;
+      border-left: 4px solid #667eea;
+      border-radius: 4px;
+    }
+
+    .test-step h3 {
+      margin-top: 0;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .test-step ol {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+
+    .test-step li {
+      margin: 8px 0;
+      line-height: 1.6;
+    }
+
+    .expected-result {
+      background: #e7f3ff;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 4px;
+      border-left: 3px solid #2196F3;
+    }
+
+    .expected-result strong {
+      color: #1976D2;
+    }
+
+    .warning {
+      background: #fff3cd;
+      border-left: 3px solid #ffc107;
+      padding: 10px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+
+    .info {
+      background: #d1ecf1;
+      border-left: 3px solid #17a2b8;
+      padding: 10px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+
+    .success {
+      background: #d4edda;
+      border-left: 3px solid #28a745;
+      padding: 10px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+
+    .test-content {
+      background: white;
+      padding: 20px;
+      margin: 20px 0;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+    }
+
+    .test-content h3 {
+      color: #764ba2;
+    }
+
+    .test-content p {
+      line-height: 1.8;
+      color: #333;
+    }
+
+    .checklist {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 15px 0;
+    }
+
+    .checklist input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+
+    .checklist label {
+      display: block;
+      margin: 10px 0;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 3px;
+      transition: background 0.2s;
+    }
+
+    .checklist label:hover {
+      background: #e9ecef;
+    }
+
+    code {
+      background: #f4f4f4;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      color: #d63384;
+    }
+
+    .edge-case {
+      background: #fff3e0;
+      border-left: 3px solid #ff9800;
+      padding: 10px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="test-header">
+    <h1>🧪 Whitelist & Blacklist Functionality Test</h1>
+    <p>Comprehensive testing guide for site-specific dark theme preferences</p>
+    <p><strong>Requirements:</strong> 7.1, 7.2, 7.3, 7.4, 7.5</p>
+  </div>
+
+  <div class="info">
+    <strong>📋 Test Overview:</strong> This test verifies that the whitelist and blacklist functionality works
+    correctly,
+    including adding/removing sites, persistence across sessions, and proper priority handling.
+  </div>
+
+  <!-- Test 1: Whitelist with Global Dark Theme Disabled -->
+  <div class="test-section">
+    <h2>Test 1: Whitelist Functionality (Global Dark Theme Disabled)</h2>
+
+    <div class="test-step">
+      <h3>Step 1.1: Setup Initial State</h3>
+      <ol>
+        <li>Open the extension popup</li>
+        <li>Ensure the main dark theme toggle is <strong>OFF</strong> (disabled globally)</li>
+        <li>Verify that this page does NOT have dark theme applied</li>
+        <li>Check that the current site shows as "Dark theme: OFF"</li>
+      </ol>
+      <div class="expected-result">
+        <strong>Expected:</strong> Page should have normal light colors, no dark theme active
+      </div>
+    </div>
+
+    <div class="test-step">
+      <h3>Step 1.2: Add Current Site to Whitelist</h3>
+      <ol>
+        <li>In the popup, locate the "Whitelist" section</li>
+        <li>Add the current site hostname to the whitelist</li>
+        <li>Click "Add to Whitelist" or equivalent button</li>
+        <li>Observe the page immediately</li>
+      </ol>
+      <div class="expected-result">
+        <strong>Expected:</strong> Dark theme should apply IMMEDIATELY even though global toggle is OFF.
+        The site should appear in the whitelist with an option to remove it.
+      </div>
+    </div>
+
+    <div class="test-step">
+      <h3>Step 1.3: Verify Whitelist Persistence</h3>
+      <ol>
+        <li>Close the popup</li>
+        <li>Refresh the page (F5 or Ctrl+R)</li>
+        <li>Observe if dark theme is still applied</li>
+        <li>Open the popup again and check if the site is still in the whitelist</li>
+      </ol>
+      <div class="expected-result">
+        <strong>Expected:</strong> Dark theme should persist after refresh. Site should still be in whitelist.
+      </div>
+    </div>
+
+    <div class="test-step">
+      <h3>Step 1.4: Remove Site from Whitelist</h3>
+      <ol>
+        <li>In the popup, find the current site in the whitelist</li>
+        <li>Click the remove/delete button next to the site</li>
+        <li>Observe the page immediately</li>
+      </ol>
+      <div class="expected-result">
+        <strong>Expected:</strong> Dark theme should be removed IMMEDIATELY. Page should return to light colors
+        since global toggle is still OFF.
+      </div>
+    </div>
+  </div>
+
+  <!-- Test 2: Blacklist with Global Dark Theme Enabled -->
+  <div class="test-section">
+    <h2>Test 2: Blacklist Functionality (Global Dark Theme Enabled)</h2>
+
+    <div class="test-step">
+      <h3>Step 2.1: Setup Initial State</h3>
+      <ol>
+        <li>Open the extension popup</li>
+        <li>Turn the main dark theme toggle <strong>ON</strong> (enabled globally)</li>
+        <li>Verify that this page now has dark theme applied</li>
+        <li>Check that the current site shows as "Dark theme: ON"</li>
+      </ol>
+      <div class="expected-result">
+        <strong>Expected:</strong> Page should have dark theme with dark backgrounds and light text
+      </div>
+    </div>
+
+    <div class="test-step">
+      <h3>Step 2.2: Add Current Site to Blacklist</h3>
+      <ol>
+        <li>In the popup, locate the "Blacklist" section</li>
+        <li>Add the current site hostname to the blacklist</li>
+        <li>Click "Add to Blacklist" or equivalent button</li>
+        <li>Observe the page immediately</li>
+      </ol>
+      <div class="expected-result">
+        <strong>Expected:</strong> Dark theme should be removed IMMEDIATELY even though global toggle is ON.
+        The site should appear in the blacklist with an option to remove it.
+      </div>
+    </div>
+
+    <div class="test-step">
+      <h3>Step 2.3: Verify Blacklist Persistence</h3>
+      <ol>
+        <li>Close the popup</li>
+        <li>Refresh the page (F5 or Ctrl+R)</li>
+        <li>Observe that dark theme is NOT applied</li>
+        <li>Open the popup again and check if the site is still in the blacklist</li>
+      </ol>
+      <div class="expected-result">
+        <strong>Expected:</strong> Dark theme should NOT be applied after refresh. Site should still be in blacklist.
+      </div>
+    </div>
+
+    <div class="test-step">
+      <h3>Step 2.4: Remove Site from Blacklist</h3>
+      <ol>
+        <li>In the popup, find the current site in the blacklist</li>
+        <li>Click the remove/delete button next to the site</li>
+        <li>Observe the page immediately</li>
+      </ol>
+      <div class="expected-result">
+        <strong>Expected:</strong> Dark theme should be applied IMMEDIATELY since global toggle is ON and
+        site is no longer blacklisted.
+      </div>
+    </div>
+  </div>
+
+  <!-- Test 3: Cross-Session Persistence -->
+  <div class="test-section">
+    <h2>Test 3: Cross-Session Persistence</h2>
+
+    <div class="test-step">
+      <h3>Step 3.1: Setup Lists</h3>
+      <ol>
+        <li>Add at least 2-3 different sites to the whitelist</li>
+        <li>Add at least 2-3 different sites to the blacklist</li>
+        <li>Verify all sites appear in their respective lists</li>
+      </ol>
+      <div class="expected-result">
+        <strong>Expected:</strong> All sites should be visible in the popup lists
+      </div>
+    </div>
+
+    <div class="test-step">
+      <h3>Step 3.2: Close and Reopen Browser</h3>
+      <ol>
+        <li>Close the popup</li>
+        <li>Close ALL browser windows completely</li>
+        <li>Reopen the browser</li>
+        <li>Navigate to this test page</li>
+        <li>Open the extension popup</li>
+      </ol>
+      <div class="expected-result">
+        <strong>Expected:</strong> All whitelisted and blacklisted sites should still be present in their lists.
+        Settings should be exactly as they were before closing the browser.
+      </div>
+    </div>
+
+    <div class="test-step">
+      <h3>Step 3.3: Verify Behavior After Restart</h3>
+      <ol>
+        <li>Navigate to a whitelisted site (with global toggle OFF)</li>
+        <li>Verify dark theme is applied</li>
+        <li>Navigate to a blacklisted site (with global toggle ON)</li>
+        <li>Verify dark theme is NOT applied</li>
+      </ol>
+      <div class="expected-result">
+        <strong>Expected:</strong> Whitelist and blacklist rules should work correctly after browser restart
+      </div>
+    </div>
+  </div>
+
+  <!-- Test 4: Edge Cases -->
+  <div class="test-section">
+    <h2>Test 4: Edge Cases - Subdomain Handling</h2>
+
+    <div class="warning">
+      <strong>⚠️ Note:</strong> These tests require navigating to different domains. You may need to use
+      local test files or actual websites to test subdomain handling.
+    </div>
+
+    <div class="test-step">
+      <h3>Step 4.1: WWW vs Non-WWW</h3>
+      <ol>
+        <li>Add <code>example.com</code> to the whitelist</li>
+        <li>Navigate to <code>http://example.com</code></li>
+        <li>Check if dark theme is applied</li>
+        <li>Navigate to <code>http://www.example.com</code></li>
+        <li>Check if dark theme is applied</li>
+      </ol>
+      <div class="edge-case">
+        <strong>Edge Case:</strong> The extension should treat <code>example.com</code> and
+        <code>www.example.com</code> as separate hostnames. If you want both to have the same behavior,
+        you need to add both to the list.
+      </div>
+      <div class="expected-result">
+        <strong>Expected:</strong> Only the exact hostname added to the list should be affected.
+        <code>www.example.com</code> and <code>example.com</code> are treated as different sites.
+      </div>
+    </div>
+
+    <div class="test-step">
+      <h3>Step 4.2: Subdomain Handling</h3>
+      <ol>
+        <li>Add <code>github.com</code> to the blacklist</li>
+        <li>Navigate to <code>https://github.com</code></li>
+        <li>Verify dark theme is NOT applied (if global is ON)</li>
+        <li>Navigate to <code>https://gist.github.com</code></li>
+        <li>Check if dark theme behavior</li>
+      </ol>
+      <div class="edge-case">
+        <strong>Edge Case:</strong> Subdomains are treated as separate hostnames.
+        <code>gist.github.com</code> is different from <code>github.com</code>.
+      </div>
+      <div class="expected-result">
+        <strong>Expected:</strong> Only <code>github.com</code> should be blacklisted.
+        <code>gist.github.com</code> should follow the global setting.
+      </div>
+    </div>
+
+    <div class="test-step">
+      <h3>Step 4.3: Localhost and IP Addresses</h3>
+      <ol>
+        <li>Add <code>localhost</code> to the whitelist</li>
+        <li>Navigate to <code>http://localhost:8080</code> (or any local server)</li>
+        <li>Check if dark theme is applied</li>
+        <li>Try adding <code>127.0.0.1</code> separately</li>
+        <li>Navigate to <code>http://127.0.0.1:8080</code></li>
+      </ol>
+      <div class="edge-case">
+        <strong>Edge Case:</strong> <code>localhost</code> and <code>127.0.0.1</code> are different hostnames
+        even though they point to the same location.
+      </div>
+      <div class="expected-result">
+        <strong>Expected:</strong> Each hostname (localhost, 127.0.0.1) needs to be added separately to the list.
+      </div>
+    </div>
+  </div>
+
+  <!-- Test 5: Priority and Conflict Resolution -->
+  <div class="test-section">
+    <h2>Test 5: Priority and Conflict Resolution</h2>
+
+    <div class="test-step">
+      <h3>Step 5.1: Blacklist Takes Priority</h3>
+      <ol>
+        <li>Add the current site to BOTH whitelist AND blacklist</li>
+        <li>Set global dark theme toggle to ON</li>
+        <li>Observe the page behavior</li>
+      </ol>
+      <div class="expected-result">
+        <strong>Expected:</strong> Blacklist should take priority. Dark theme should NOT be applied
+        even though the site is in both lists and global toggle is ON.
+      </div>
+    </div>
+
+    <div class="test-step">
+      <h3>Step 5.2: Remove from Blacklist</h3>
+      <ol>
+        <li>Remove the current site from the blacklist (keep it in whitelist)</li>
+        <li>Observe the page behavior</li>
+      </ol>
+      <div class="expected-result">
+        <strong>Expected:</strong> Dark theme should now be applied since the site is in the whitelist
+        and no longer in the blacklist.
+      </div>
+    </div>
+
+    <div class="test-step">
+      <h3>Step 5.3: Clean Up</h3>
+      <ol>
+        <li>Remove the current site from the whitelist</li>
+        <li>Verify the page follows the global toggle setting</li>
+      </ol>
+      <div class="expected-result">
+        <strong>Expected:</strong> Page should follow global dark theme setting (ON or OFF)
+      </div>
+    </div>
+  </div>
+
+  <!-- Test Content -->
+  <div class="test-content">
+    <h3>Test Content Area</h3>
+    <p>
+      This section contains various elements to help you visually verify that the dark theme is being
+      applied or removed correctly during testing.
+    </p>
+    <p>
+      <strong>Text elements:</strong> This is bold text. <em>This is italic text.</em>
+      <a href="#">This is a link.</a>
+    </p>
+    <p>
+      <button onclick="alert('Button clicked!')">Test Button</button>
+      <input type="text" placeholder="Test input field" />
+    </p>
+    <p style="background-color: #e0e0e0; padding: 10px; border-radius: 4px;">
+      This paragraph has a custom background color to test how the dark theme handles existing styles.
+    </p>
+  </div>
+
+  <!-- Test Checklist -->
+  <div class="test-section">
+    <h2>✅ Test Completion Checklist</h2>
+
+    <div class="checklist">
+      <label>
+        <input type="checkbox" />
+        Test 1.1-1.4: Whitelist with global dark theme disabled - All steps passed
+      </label>
+      <label>
+        <input type="checkbox" />
+        Test 2.1-2.4: Blacklist with global dark theme enabled - All steps passed
+      </label>
+      <label>
+        <input type="checkbox" />
+        Test 3.1-3.3: Cross-session persistence - Settings survived browser restart
+      </label>
+      <label>
+        <input type="checkbox" />
+        Test 4.1: WWW vs non-WWW treated as separate hostnames
+      </label>
+      <label>
+        <input type="checkbox" />
+        Test 4.2: Subdomains treated as separate hostnames
+      </label>
+      <label>
+        <input type="checkbox" />
+        Test 4.3: Localhost and IP addresses work correctly
+      </label>
+      <label>
+        <input type="checkbox" />
+        Test 5.1-5.3: Blacklist takes priority over whitelist
+      </label>
+      <label>
+        <input type="checkbox" />
+        Sites can be added to lists successfully
+      </label>
+      <label>
+        <input type="checkbox" />
+        Sites can be removed from lists successfully
+      </label>
+      <label>
+        <input type="checkbox" />
+        List changes persist across page refreshes
+      </label>
+      <label>
+        <input type="checkbox" />
+        List changes persist across browser restarts
+      </label>
+      <label>
+        <input type="checkbox" />
+        Dark theme applies/removes immediately when lists change
+      </label>
+    </div>
+
+    <div class="success">
+      <strong>✅ All Tests Passed:</strong> If all checkboxes above are checked, the whitelist and blacklist
+      functionality is working correctly and meets all requirements (7.1, 7.2, 7.3, 7.4, 7.5).
+    </div>
+  </div>
+
+  <!-- Requirements Mapping -->
+  <div class="test-section">
+    <h2>📋 Requirements Coverage</h2>
+
+    <div class="info">
+      <strong>Requirement 7.1:</strong> WHEN the user adds a site to the whitelist THEN the system SHALL
+      always apply dark theme to that site
+      <br><strong>Tested in:</strong> Test 1 (Steps 1.2-1.3)
+    </div>
+
+    <div class="info">
+      <strong>Requirement 7.2:</strong> WHEN the user adds a site to the blacklist THEN the system SHALL
+      never apply dark theme to that site
+      <br><strong>Tested in:</strong> Test 2 (Steps 2.2-2.3)
+    </div>
+
+    <div class="info">
+      <strong>Requirement 7.3:</strong> WHEN the popup displays site lists THEN the system SHALL show all
+      whitelisted and blacklisted domains
+      <br><strong>Tested in:</strong> All tests (visual verification in popup)
+    </div>
+
+    <div class="info">
+      <strong>Requirement 7.4:</strong> WHEN the user removes a site from a list THEN the system SHALL
+      update chrome.storage.sync and refresh the display
+      <br><strong>Tested in:</strong> Test 1 (Step 1.4), Test 2 (Step 2.4)
+    </div>
+
+    <div class="info">
+      <strong>Requirement 7.5:</strong> WHEN checking if dark theme should apply THEN the content script
+      SHALL respect whitelist/blacklist preferences
+      <br><strong>Tested in:</strong> All tests, especially Test 5 (priority handling)
+    </div>
+  </div>
+
+  <script>
+    // Add some interactivity to make testing more engaging
+    document.querySelectorAll('.checklist input[type="checkbox"]').forEach(checkbox => {
+      checkbox.addEventListener('change', function () {
+        const allChecked = Array.from(document.querySelectorAll('.checklist input[type="checkbox"]'))
+          .every(cb => cb.checked);
+
+        if (allChecked) {
+          const successDiv = document.querySelector('.success');
+          successDiv.style.animation = 'pulse 0.5s';
+          setTimeout(() => {
+            successDiv.style.animation = '';
+          }, 500);
+        }
+      });
+    });
+
+    // Log current hostname for easy reference
+    console.log('Current hostname:', window.location.hostname);
+    console.log('Current URL:', window.location.href);
+  </script>
+
+  <style>
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.02);
+      }
+    }
+  </style>
+</body>
+
+</html>

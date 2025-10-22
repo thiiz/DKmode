@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hostname Edge Cases Test</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1000px;
+      margin: 20px auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    h1 {
+      color: #667eea;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 15px;
+    }
+
+    .info-box {
+      background: #e7f3ff;
+      border-left: 4px solid #2196F3;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+
+    .hostname-display {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      border: 2px solid #dee2e6;
+    }
+
+    .hostname-display h2 {
+      margin-top: 0;
+      color: #495057;
+    }
+
+    .hostname-value {
+      font-family: 'Courier New', monospace;
+      font-size: 18px;
+      color: #d63384;
+      background: white;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #dee2e6;
+      margin: 10px 0;
+    }
+
+    .test-scenario {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+
+    .test-scenario h3 {
+      margin-top: 0;
+      color: #856404;
+    }
+
+    .test-instructions {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+
+    .test-instructions ol {
+      margin: 10px 0;
+      padding-left: 25px;
+    }
+
+    .test-instructions li {
+      margin: 8px 0;
+      line-height: 1.6;
+    }
+
+    .warning {
+      background: #f8d7da;
+      border-left: 4px solid #dc3545;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+      color: #721c24;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      text-align: left;
+      border: 1px solid #dee2e6;
+    }
+
+    th {
+      background: #667eea;
+      color: white;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background: #f8f9fa;
+    }
+
+    .code {
+      background: #f4f4f4;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      color: #d63384;
+      font-size: 14px;
+    }
+
+    .test-content {
+      padding: 20px;
+      margin: 20px 0;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #5568d3;
+    }
+
+    .copy-btn {
+      background: #28a745;
+    }
+
+    .copy-btn:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>🌐 Hostname Edge Cases Test</h1>
+
+    <div class="info-box">
+      <strong>Purpose:</strong> This test file helps verify how the Dark Theme Extension handles different
+      hostname variations, including www vs non-www, subdomains, localhost, and IP addresses.
+    </div>
+
+    <!-- Current Hostname Display -->
+    <div class="hostname-display">
+      <h2>Current Page Information</h2>
+      <div>
+        <strong>Full URL:</strong>
+        <div class="hostname-value" id="fullUrl"></div>
+      </div>
+      <div>
+        <strong>Hostname:</strong>
+        <div class="hostname-value" id="hostname"></div>
+      </div>
+      <div>
+        <strong>Protocol:</strong>
+        <div class="hostname-value" id="protocol"></div>
+      </div>
+      <div>
+        <strong>Port:</strong>
+        <div class="hostname-value" id="port"></div>
+      </div>
+      <button class="copy-btn" onclick="copyHostname()">📋 Copy Hostname</button>
+    </div>
+
+    <!-- Test Scenarios -->
+    <div class="test-scenario">
+      <h3>Test Scenario 1: WWW vs Non-WWW</h3>
+      <p>
+        The extension treats <span class="code">example.com</span> and
+        <span class="code">www.example.com</span> as completely separate hostnames.
+      </p>
+    </div>
+
+    <div class="test-instructions">
+      <strong>Testing Steps:</strong>
+      <ol>
+        <li>Open the extension popup</li>
+        <li>Add <span class="code">example.com</span> to the whitelist (without www)</li>
+        <li>Navigate to <span class="code">http://example.com</span></li>
+        <li>Verify dark theme is applied</li>
+        <li>Navigate to <span class="code">http://www.example.com</span></li>
+        <li>Verify dark theme is NOT applied (different hostname)</li>
+        <li>Add <span class="code">www.example.com</span> to the whitelist as well</li>
+        <li>Navigate to <span class="code">http://www.example.com</span> again</li>
+        <li>Verify dark theme is now applied</li>
+      </ol>
+    </div>
+
+    <div class="test-scenario">
+      <h3>Test Scenario 2: Subdomain Handling</h3>
+      <p>
+        Subdomains are treated as completely separate hostnames. Adding
+        <span class="code">github.com</span> to a list does NOT affect
+        <span class="code">gist.github.com</span> or <span class="code">api.github.com</span>.
+      </p>
+    </div>
+
+    <div class="test-instructions">
+      <strong>Testing Steps:</strong>
+      <ol>
+        <li>Enable global dark theme</li>
+        <li>Add <span class="code">github.com</span> to the blacklist</li>
+        <li>Navigate to <span class="code">https://github.com</span></li>
+        <li>Verify dark theme is NOT applied (blacklisted)</li>
+        <li>Navigate to <span class="code">https://gist.github.com</span></li>
+        <li>Verify dark theme IS applied (different hostname, not blacklisted)</li>
+        <li>Navigate to <span class="code">https://api.github.com</span></li>
+        <li>Verify dark theme IS applied (different hostname, not blacklisted)</li>
+      </ol>
+    </div>
+
+    <div class="test-scenario">
+      <h3>Test Scenario 3: Localhost Variations</h3>
+      <p>
+        <span class="code">localhost</span> and <span class="code">127.0.0.1</span> are
+        treated as different hostnames, even though they point to the same location.
+      </p>
+    </div>
+
+    <div class="test-instructions">
+      <strong>Testing Steps:</strong>
+      <ol>
+        <li>Disable global dark theme</li>
+        <li>Add <span class="code">localhost</span> to the whitelist</li>
+        <li>Open this file via <span class="code">http://localhost:8080/test-hostname-edge-cases.html</span>
+          (requires local server)</li>
+        <li>Verify dark theme is applied</li>
+        <li>Open the same file via <span class="code">http://127.0.0.1:8080/test-hostname-edge-cases.html</span></li>
+        <li>Verify dark theme is NOT applied (different hostname)</li>
+        <li>Add <span class="code">127.0.0.1</span> to the whitelist</li>
+        <li>Refresh the page</li>
+        <li>Verify dark theme is now applied</li>
+      </ol>
+    </div>
+
+    <div class="warning">
+      <strong>⚠️ Note:</strong> To test localhost scenarios, you need to run a local web server.
+      You can use Python's built-in server: <span class="code">python -m http.server 8080</span>
+    </div>
+
+    <div class="test-scenario">
+      <h3>Test Scenario 4: Port Numbers</h3>
+      <p>
+        Port numbers are part of the hostname. <span class="code">localhost:3000</span> and
+        <span class="code">localhost:8080</span> are treated as different hostnames.
+      </p>
+    </div>
+
+    <div class="test-instructions">
+      <strong>Testing Steps:</strong>
+      <ol>
+        <li>Add <span class="code">localhost:8080</span> to the whitelist</li>
+        <li>Navigate to <span class="code">http://localhost:8080</span></li>
+        <li>Verify dark theme is applied</li>
+        <li>Navigate to <span class="code">http://localhost:3000</span></li>
+        <li>Verify dark theme is NOT applied (different port = different hostname)</li>
+      </ol>
+    </div>
+
+    <!-- Hostname Comparison Table -->
+    <h2>Hostname Comparison Reference</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>URL</th>
+          <th>Extracted Hostname</th>
+          <th>Are They Same?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>http://example.com</td>
+          <td class="code">example.com</td>
+          <td rowspan="2">❌ Different</td>
+        </tr>
+        <tr>
+          <td>http://www.example.com</td>
+          <td class="code">www.example.com</td>
+        </tr>
+        <tr>
+          <td>https://github.com</td>
+          <td class="code">github.com</td>
+          <td rowspan="2">❌ Different</td>
+        </tr>
+        <tr>
+          <td>https://gist.github.com</td>
+          <td class="code">gist.github.com</td>
+        </tr>
+        <tr>
+          <td>http://localhost</td>
+          <td class="code">localhost</td>
+          <td rowspan="2">❌ Different</td>
+        </tr>
+        <tr>
+          <td>http://127.0.0.1</td>
+          <td class="code">127.0.0.1</td>
+        </tr>
+        <tr>
+          <td>http://localhost:8080</td>
+          <td class="code">localhost:8080</td>
+          <td rowspan="2">❌ Different</td>
+        </tr>
+        <tr>
+          <td>http://localhost:3000</td>
+          <td class="code">localhost:3000</td>
+        </tr>
+        <tr>
+          <td>http://example.com/page1</td>
+          <td class="code">example.com</td>
+          <td rowspan="2">✅ Same</td>
+        </tr>
+        <tr>
+          <td>http://example.com/page2</td>
+          <td class="code">example.com</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Key Takeaways -->
+    <div class="info-box">
+      <h3>🔑 Key Takeaways</h3>
+      <ul>
+        <li><strong>Exact Matching:</strong> The extension uses exact hostname matching from <span
+            class="code">window.location.hostname</span></li>
+        <li><strong>WWW Matters:</strong> www.example.com ≠ example.com</li>
+        <li><strong>Subdomains Matter:</strong> subdomain.example.com ≠ example.com</li>
+        <li><strong>Localhost vs IP:</strong> localhost ≠ 127.0.0.1</li>
+        <li><strong>Ports Matter:</strong> localhost:8080 ≠ localhost:3000</li>
+        <li><strong>Paths Don't Matter:</strong> example.com/page1 = example.com/page2 (same hostname)</li>
+      </ul>
+    </div>
+
+    <!-- Test Content -->
+    <div class="test-content">
+      <h3>Visual Test Content</h3>
+      <p>
+        Use this content area to visually verify whether the dark theme is applied or not.
+      </p>
+      <p>
+        <strong>Elements to check:</strong>
+      </p>
+      <ul>
+        <li>Background color (should be dark when theme is active)</li>
+        <li>Text color (should be light when theme is active)</li>
+        <li>Button styling</li>
+        <li>Input field styling</li>
+      </ul>
+      <p>
+        <button onclick="alert('Button works!')">Test Button</button>
+        <input type="text" placeholder="Test input" style="padding: 8px; margin: 5px;" />
+      </p>
+    </div>
+
+    <!-- Quick Reference -->
+    <div class="test-instructions">
+      <h3>Quick Test Reference</h3>
+      <p><strong>To test this file on different hostnames:</strong></p>
+      <ol>
+        <li>Save this file to your computer</li>
+        <li>Start a local web server in the directory:
+          <ul>
+            <li>Python 3: <span class="code">python -m http.server 8080</span></li>
+            <li>Python 2: <span class="code">python -m SimpleHTTPServer 8080</span></li>
+            <li>Node.js: <span class="code">npx http-server -p 8080</span></li>
+          </ul>
+        </li>
+        <li>Access via different URLs:
+          <ul>
+            <li><span class="code">http://localhost:8080/test-hostname-edge-cases.html</span></li>
+            <li><span class="code">http://127.0.0.1:8080/test-hostname-edge-cases.html</span></li>
+          </ul>
+        </li>
+        <li>Test whitelist/blacklist behavior for each hostname</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    // Display current page information
+    function updatePageInfo() {
+      document.getElementById('fullUrl').textContent = window.location.href;
+      document.getElementById('hostname').textContent = window.location.hostname || '(file:// protocol - no hostname)';
+      document.getElementById('protocol').textContent = window.location.protocol;
+      document.getElementById('port').textContent = window.location.port || '(default port)';
+    }
+
+    function copyHostname() {
+      const hostname = window.location.hostname;
+      if (hostname) {
+        navigator.clipboard.writeText(hostname).then(() => {
+          alert('Hostname copied to clipboard: ' + hostname);
+        }).catch(err => {
+          console.error('Failed to copy:', err);
+          alert('Failed to copy hostname. Please copy manually: ' + hostname);
+        });
+      } else {
+        alert('No hostname available (file:// protocol)');
+      }
+    }
+
+    // Update on load
+    updatePageInfo();
+
+    // Log to console for debugging
+    console.log('=== Page Information ===');
+    console.log('Full URL:', window.location.href);
+    console.log('Hostname:', window.location.hostname);
+    console.log('Protocol:', window.location.protocol);
+    console.log('Port:', window.location.port);
+    console.log('Pathname:', window.location.pathname);
+    console.log('========================');
+  </script>
+</body>
+
+</html>

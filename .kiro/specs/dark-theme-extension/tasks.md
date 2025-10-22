@@ -184,7 +184,7 @@
 
 
 
-- [ ] 11. Implement current site info display
+- [x] 11. Implement current site info display
 
 
 
@@ -201,7 +201,7 @@
   - Add visual indicator (icon or color) for theme status
   - _Requirements: 4.4_
 
-- [ ] 12. Implement site list management UI
+- [x] 12. Implement site list management UI
 
 
 
@@ -224,7 +224,7 @@
   - _Requirements: 4.8, 7.3_
 
 
-- [ ] 13. Implement whitelist functionality
+- [x] 13. Implement whitelist functionality
 
 
 
@@ -247,7 +247,7 @@
   - _Requirements: 7.1, 7.4_
 
 
-- [ ] 14. Implement blacklist functionality
+- [x] 14. Implement blacklist functionality
 
 
 
@@ -262,7 +262,7 @@
   - Update storage when blacklist changes
   - _Requirements: 7.2, 7.4_
 
-- [ ] 15. Implement background service worker
+- [x] 15. Implement background service worker
 
 
 
@@ -284,7 +284,7 @@
 
 
 
-- [ ] 16. Implement cross-tab synchronization
+- [x] 16. Implement cross-tab synchronization
 
 
   - Add SETTINGS_UPDATED message handler in content script
@@ -332,12 +332,6 @@
 
 - [x] 19. Create extension icons
 
-
-
-
-
-- [ ] 19. Create extension icons
-
   - Create or source icon images in multiple sizes (16x16, 32x32, 48x48, 128x128)
   - Save icons to src/assets/icons/ directory
   - Ensure icons are in PNG format
@@ -378,7 +372,7 @@
 
 
 
-- [ ] 22. Test build and extension loading
+- [x] 22. Test build and extension loading
 
 
   - Run npm run build command
@@ -406,7 +400,12 @@
   - Test on sites with existing dark modes
   - _Requirements: 3.5, 3.6, 3.7_
 
-- [ ] 24. Test settings persistence and sync
+- [x] 24. Test settings persistence and sync
+
+
+
+
+
 
 
 
@@ -417,7 +416,12 @@
   - Verify site-specific settings persist correctly
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 25. Test whitelist and blacklist functionality
+
+
+- [x] 25. Test whitelist and blacklist functionality
+
+
+
 
 
 
@@ -431,13 +435,22 @@
   - Test edge cases (subdomain handling, www vs non-www)
 
 
+
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5_
 
-- [ ] 26. Test intensity control
+
+
+
+
+- [x] 26. Test intensity control
 
 
   - Adjust intensity slider and verify immediate visual changes
   - Test minimum intensity (subtle changes)
+
+
+
+
 
 
   - Test maximum intensity (full inversion)
@@ -445,7 +458,10 @@
   - Test intensity on different types of content (text, images, videos)
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
 
-- [ ] 27. Performance testing and optimization
+- [x] 27. Performance testing and optimization
+
+
+
 
 
   - Measure content script execution time on various sites
@@ -458,9 +474,12 @@
 - [ ] 28. Fix any bugs found during testing
 
 
+
   - Document bugs with reproduction steps
   - Prioritize bugs by severity
   - Fix critical bugs that break core functionality
+
+
   - Fix UI/UX issues that impact usability
   - Retest after fixes to verify resolution
   - _Requirements: 9.4_
