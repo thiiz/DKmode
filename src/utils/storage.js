@@ -5,9 +5,8 @@
 
 // Default settings for the extension
 const DEFAULT_SETTINGS = {
-  darkThemeEnabled: false,
+  darkThemeEnabled: true, // Enabled by default
   intensity: 80,
-  whitelist: [],
   blacklist: [],
   siteSettings: {}
 };
@@ -170,3 +169,4 @@ export async function resetToDefaults() {
 
 // Export default settings for use in other modules
 export { DEFAULT_SETTINGS };
+

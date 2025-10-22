@@ -432,13 +432,6 @@ body {
   font-size: 14px;
   font-weight: 600;
   margin: 0 0 4px 0;
-}
-
-.site-list-title.whitelist {
-  color: #4CAF50;
-}
-
-.site-list-title.blacklist {
   color: #f44336;
 }
 

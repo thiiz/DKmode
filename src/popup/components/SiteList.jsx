@@ -4,11 +4,8 @@ export function SiteList({ type, sites, onSitesChange, currentSite }) {
   const [inputValue, setInputValue] = useState('');
   const [validationError, setValidationError] = useState(null);
 
-  const isWhitelist = type === 'whitelist';
-  const title = isWhitelist ? 'Whitelist' : 'Blacklist';
-  const description = isWhitelist
-    ? 'Sites that always get dark theme'
-    : 'Sites that never get dark theme';
+  const title = 'Blacklist';
+  const description = 'Sites that never get dark theme';
 
   /**
    * Validate hostname format
