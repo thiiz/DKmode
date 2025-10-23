@@ -5,7 +5,7 @@ export function Header() {
         Dark Theme Extension
       </h1>
       <p className="header-subtitle">
-        Apply customizable dark themes to any website
+        Apply dark theme to any website
       </p>
     </div>
   );

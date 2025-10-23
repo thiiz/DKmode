@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 import { CurrentSiteInfo } from './components/CurrentSiteInfo';
 import { Header } from './components/Header';
-import { IntensitySlider } from './components/IntensitySlider';
 import { SiteListManager } from './components/SiteListManager';
 import { ThemeToggle } from './components/ThemeToggle';
 
@@ -31,7 +30,6 @@ function isRestrictedUrl(url) {
 export function App() {
   // State management
   const [darkThemeEnabled, setDarkThemeEnabled] = useState(true); // Enabled by default
-  const [intensity, setIntensity] = useState(80);
   const [currentSite, setCurrentSite] = useState('');
   const [blacklist, setBlacklist] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -44,12 +42,10 @@ export function App() {
       try {
         const settings = await chrome.storage.sync.get([
           'darkThemeEnabled',
-          'intensity',
           'blacklist'
         ]);
 
         setDarkThemeEnabled(settings.darkThemeEnabled !== undefined ? settings.darkThemeEnabled : true);
-        setIntensity(settings.intensity || 80);
         setBlacklist(settings.blacklist || []);
       } catch (error) {
         console.error('Failed to load settings:', error);
@@ -57,7 +53,6 @@ export function App() {
 
         // Use default values on error
         setDarkThemeEnabled(true);
-        setIntensity(80);
         setBlacklist([]);
       } finally {
         setLoading(false);
@@ -151,8 +146,7 @@ export function App() {
       await sendMessageToContentScript({
         type: 'TOGGLE_DARK_THEME',
         enabled: enabled,
-        site: currentSite,
-        intensity: intensity
+        site: currentSite
       });
 
       // Save settings to chrome.storage.sync
@@ -218,8 +212,7 @@ export function App() {
           await sendMessageToContentScript({
             type: 'TOGGLE_DARK_THEME',
             enabled: false,
-            site: currentSite,
-            intensity: intensity
+            site: currentSite
           });
 
           setSuccess(`${currentSite} added to blacklist and dark theme removed`);
@@ -244,8 +237,7 @@ export function App() {
             await sendMessageToContentScript({
               type: 'TOGGLE_DARK_THEME',
               enabled: true,
-              site: currentSite,
-              intensity: intensity
+              site: currentSite
             });
 
             setSuccess(`${currentSite} removed from blacklist and dark theme applied`);
@@ -314,15 +306,9 @@ export function App() {
         currentSite={currentSite}
       />
 
-      <IntensitySlider
-        intensity={intensity}
-        onIntensityChange={setIntensity}
-      />
-
       <CurrentSiteInfo
         currentSite={currentSite}
         darkThemeEnabled={darkThemeEnabled}
-        intensity={intensity}
       />
 
       <SiteListManager

@@ -6,7 +6,6 @@
 // Default settings for the extension
 const DEFAULT_SETTINGS = {
   darkThemeEnabled: true, // Enabled by default
-  intensity: 80,
   blacklist: [],
   siteSettings: {}
 };

@@ -1,11 +1,10 @@
 /* Dark Theme Extension - Content Styles */
 
-/* CSS Custom Properties for Dynamic Intensity Control */
+/* CSS Custom Properties */
 :root {
-  --dark-theme-intensity: 0.8;
-  --dark-bg: hsl(0, 0%, calc(5% + (10% * (1 - var(--dark-theme-intensity)))));
-  --dark-text: hsl(0, 0%, calc(85% + (10% * var(--dark-theme-intensity))));
-  --dark-border: hsl(0, 0%, calc(20% + (20% * (1 - var(--dark-theme-intensity)))));
+  --dark-bg: hsl(0, 0%, 10%);
+  --dark-text: hsl(0, 0%, 90%);
+  --dark-border: hsl(0, 0%, 30%);
 }
 
 /* Base Dark Theme Styles */
@@ -84,12 +83,12 @@
 .dark-theme-active img,
 .dark-theme-active video,
 .dark-theme-active canvas {
-  filter: brightness(calc(0.8 + (0.2 * (1 - var(--dark-theme-intensity))))) !important;
+  filter: brightness(0.9) !important;
 }
 
 /* SVG Elements */
 .dark-theme-active svg {
-  filter: invert(calc(var(--dark-theme-intensity))) !important;
+  filter: invert(0.85) !important;
 }
 
 /* Code Blocks */

@@ -1,4 +1,4 @@
-export function CurrentSiteInfo({ currentSite, darkThemeEnabled, intensity }) {
+export function CurrentSiteInfo({ currentSite, darkThemeEnabled }) {
   if (!currentSite) {
     return (
       <div className="current-site-info">
@@ -34,12 +34,6 @@ export function CurrentSiteInfo({ currentSite, darkThemeEnabled, intensity }) {
           <span className="site-info-item-label">Status: </span>
           <span className={`site-info-item-value ${darkThemeEnabled ? 'active' : ''}`}>
             {darkThemeEnabled ? 'Active' : 'Inactive'}
-          </span>
-        </div>
-        <div className="site-info-item">
-          <span className="site-info-item-label">Intensity: </span>
-          <span className="site-info-item-value">
-            {intensity}%
           </span>
         </div>
       </div>

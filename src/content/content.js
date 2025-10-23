@@ -6,7 +6,6 @@
 // In-memory fallback settings when storage is unavailable
 const fallbackSettings = {
   darkThemeEnabled: true, // Enabled by default
-  intensity: 80,
   blacklist: [],
   siteSettings: {}
 };
@@ -151,13 +150,11 @@ async function saveSettingsSafely(settings) {
 
 // Initialize dark theme on page load
 async function initDarkTheme() {
-  const startTime = performance.now();
   try {
     console.log('[Dark Theme Extension] Initializing dark theme on page load...');
 
     const settings = await getSettingsSafely([
       'darkThemeEnabled',
-      'intensity',
       'blacklist',
       'siteSettings'
     ]);
@@ -170,9 +167,8 @@ async function initDarkTheme() {
     console.log(`[Dark Theme Extension] Should apply dark theme to ${currentSite}:`, shouldApply);
 
     if (shouldApply) {
-      const intensity = settings.siteSettings?.[currentSite]?.intensity || settings.intensity || 80;
-      console.log(`[Dark Theme Extension] Applying dark theme with intensity: ${intensity}%`);
-      applyDarkTheme(intensity);
+      console.log('[Dark Theme Extension] Applying dark theme');
+      applyDarkTheme();
     } else {
       console.log('[Dark Theme Extension] Dark theme not applied based on settings');
     }
@@ -190,26 +186,21 @@ async function initDarkTheme() {
   }
 }
 
-// Apply dark theme with specified intensity
-function applyDarkTheme(intensity) {
+// Apply dark theme
+function applyDarkTheme() {
   const startTime = performance.now();
   try {
-    // Validate intensity value
-    const validIntensity = Math.max(0, Math.min(100, intensity || 80));
-
     // Check if document is ready for manipulation
     if (!document.documentElement) {
       throw new Error('Document element not available');
     }
 
     document.documentElement.classList.add('dark-theme-active');
-    document.documentElement.style.setProperty('--dark-theme-intensity', validIntensity / 100);
 
     recordPerformance('applyThemeTime', performance.now() - startTime);
-    console.log(`[Dark Theme Extension] Successfully applied dark theme with intensity: ${validIntensity}%`);
+    console.log('[Dark Theme Extension] Successfully applied dark theme');
   } catch (error) {
     logError('applyDarkTheme', error, {
-      intensity,
       documentReady: !!document.documentElement
     });
     recordPerformance('applyThemeTime', performance.now() - startTime);
@@ -226,7 +217,6 @@ function removeDarkTheme() {
     }
 
     document.documentElement.classList.remove('dark-theme-active');
-    document.documentElement.style.removeProperty('--dark-theme-intensity');
 
     recordPerformance('removeThemeTime', performance.now() - startTime);
     console.log('[Dark Theme Extension] Successfully removed dark theme');
@@ -276,7 +266,7 @@ function determineShouldApply(site, settings) {
 }
 
 // Save site-specific settings
-async function saveSiteSettings(site, enabled, intensity) {
+async function saveSiteSettings(site, enabled) {
   try {
     // Validate inputs
     if (!site || typeof site !== 'string') {
@@ -287,7 +277,6 @@ async function saveSiteSettings(site, enabled, intensity) {
 
     siteSettings[site] = {
       enabled,
-      intensity,
       lastModified: Date.now()
     };
 
@@ -297,7 +286,7 @@ async function saveSiteSettings(site, enabled, intensity) {
       console.warn('[Dark Theme Extension] Settings saved to fallback only (storage unavailable)');
     }
   } catch (error) {
-    logError('saveSiteSettings', error, { site, enabled, intensity, storageAvailable });
+    logError('saveSiteSettings', error, { site, enabled, storageAvailable });
   }
 }
 
@@ -307,7 +296,6 @@ async function handleSettingsUpdate(changes) {
     // Get current settings to determine what changed
     const settings = await getSettingsSafely([
       'darkThemeEnabled',
-      'intensity',
       'blacklist',
       'siteSettings'
     ]);
@@ -325,20 +313,12 @@ async function handleSettingsUpdate(changes) {
     // Determine if we need to apply or remove the theme
     if (shouldApply && !isCurrentlyActive) {
       // Theme should be active but isn't - apply it
-      const intensity = settings.siteSettings?.[currentSite]?.intensity || settings.intensity || 80;
-      applyDarkTheme(intensity);
+      applyDarkTheme();
       console.log('[Dark Theme Extension] Applied theme due to settings update from another tab');
     } else if (!shouldApply && isCurrentlyActive) {
       // Theme is active but shouldn't be - remove it
       removeDarkTheme();
       console.log('[Dark Theme Extension] Removed theme due to settings update from another tab');
-    } else if (shouldApply && isCurrentlyActive) {
-      // Theme is active and should stay active - check if intensity changed
-      if (changes.intensity || changes.siteSettings) {
-        const intensity = settings.siteSettings?.[currentSite]?.intensity || settings.intensity || 80;
-        applyDarkTheme(intensity);
-        console.log('[Dark Theme Extension] Updated intensity due to settings update from another tab');
-      }
     }
   } catch (error) {
     logError('handleSettingsUpdate', error, {
@@ -364,37 +344,16 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       case 'TOGGLE_DARK_THEME':
         try {
           if (message.enabled) {
-            const intensity = message.intensity || 80;
-            applyDarkTheme(intensity);
-            saveSiteSettings(currentSite, true, intensity);
+            applyDarkTheme();
+            saveSiteSettings(currentSite, true);
           } else {
             removeDarkTheme();
-            saveSiteSettings(currentSite, false, null);
+            saveSiteSettings(currentSite, false);
           }
           recordPerformance('messageHandlingTime', performance.now() - messageStartTime);
           sendResponse({ success: true });
         } catch (error) {
           logError('TOGGLE_DARK_THEME handler', error, { message });
-          recordPerformance('messageHandlingTime', performance.now() - messageStartTime);
-          sendResponse({ success: false, error: error.message });
-        }
-        break;
-
-      case 'UPDATE_INTENSITY':
-        try {
-          // Validate document is ready
-          if (!document.documentElement) {
-            throw new Error('Document element not available');
-          }
-
-          if (document.documentElement.classList.contains('dark-theme-active')) {
-            applyDarkTheme(message.intensity);
-            saveSiteSettings(currentSite, true, message.intensity);
-          }
-          recordPerformance('messageHandlingTime', performance.now() - messageStartTime);
-          sendResponse({ success: true });
-        } catch (error) {
-          logError('UPDATE_INTENSITY handler', error, { message });
           recordPerformance('messageHandlingTime', performance.now() - messageStartTime);
           sendResponse({ success: false, error: error.message });
         }
