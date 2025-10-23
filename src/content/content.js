@@ -1,593 +1,338 @@
 /**
  * Dark Theme Extension - Content Script
- * Applies dark theme styles to web pages based on user preferences
+ * Intelligent dark theme with contrast detection
  */
 
-// In-memory fallback settings when storage is unavailable
-const fallbackSettings = {
-  darkThemeEnabled: true, // Enabled by default
+// Settings cache
+let settings = {
+  darkThemeEnabled: true,
   blacklist: [],
   siteSettings: {}
 };
 
-// Track if storage is available
-let storageAvailable = true;
-
-// Performance monitoring
-const performanceMetrics = {
-  initStartTime: performance.now(),
-  initEndTime: null,
-  applyThemeTime: [],
-  removeThemeTime: [],
-  storageReadTime: [],
-  storageWriteTime: [],
-  messageHandlingTime: []
-};
-
 /**
- * Record performance metric
- * @param {string} operation - Name of the operation
- * @param {number} duration - Duration in milliseconds
+ * Get settings from storage
  */
-function recordPerformance(operation, duration) {
-  if (performanceMetrics[operation]) {
-    performanceMetrics[operation].push(duration);
-  }
-
-  // Log slow operations (> 50ms)
-  if (duration > 50) {
-    console.warn(`[Dark Theme Extension] Slow operation detected: ${operation} took ${duration.toFixed(2)}ms`);
-  }
-}
-
-/**
- * Get performance statistics
- * @returns {Object} Performance statistics
- */
-function getPerformanceStats() {
-  const stats = {
-    initializationTime: performanceMetrics.initEndTime
-      ? (performanceMetrics.initEndTime - performanceMetrics.initStartTime).toFixed(2) + 'ms'
-      : 'Not completed',
-    operations: {}
-  };
-
-  for (const [key, values] of Object.entries(performanceMetrics)) {
-    if (Array.isArray(values) && values.length > 0) {
-      const avg = values.reduce((a, b) => a + b, 0) / values.length;
-      const max = Math.max(...values);
-      const min = Math.min(...values);
-
-      stats.operations[key] = {
-        count: values.length,
-        average: avg.toFixed(2) + 'ms',
-        max: max.toFixed(2) + 'ms',
-        min: min.toFixed(2) + 'ms'
-      };
-    }
-  }
-
-  return stats;
-}
-
-// Expose performance stats to window for testing
-window.__darkThemePerformance = {
-  getStats: getPerformanceStats,
-  getRawMetrics: () => performanceMetrics
-};
-
-/**
- * Enhanced error logging function with context
- * @param {string} context - Description of where the error occurred
- * @param {Error} error - The error object
- * @param {Object} additionalInfo - Additional context information
- */
-function logError(context, error, additionalInfo = {}) {
-  const errorDetails = {
-    context,
-    message: error.message,
-    stack: error.stack,
-    timestamp: new Date().toISOString(),
-    url: window.location.href,
-    ...additionalInfo
-  };
-
-  console.error(`[Dark Theme Extension] Error in ${context}:`, errorDetails);
-
-  // Could extend to send to analytics service if needed
-  // Example: sendErrorToAnalytics(errorDetails);
-}
-
-/**
- * Safely get settings from storage with fallback
- * @param {Array<string>} keys - Keys to retrieve from storage
- * @returns {Promise<Object>} Settings object
- */
-async function getSettingsSafely(keys) {
-  const startTime = performance.now();
+async function getSettings() {
   try {
-    if (!storageAvailable) {
-      logError('getSettingsSafely', new Error('Storage unavailable, using fallback'), { keys });
-      return fallbackSettings;
-    }
-
-    const settings = await chrome.storage.sync.get(keys);
-    recordPerformance('storageReadTime', performance.now() - startTime);
+    const stored = await chrome.storage.sync.get(['darkThemeEnabled', 'blacklist', 'siteSettings']);
+    settings = { ...settings, ...stored };
     return settings;
   } catch (error) {
-    logError('getSettingsSafely', error, { keys });
-    storageAvailable = false;
-    recordPerformance('storageReadTime', performance.now() - startTime);
-    return fallbackSettings;
+    console.error('[Dark Theme] Storage error:', error);
+    return settings;
   }
 }
 
 /**
- * Safely save settings to storage with fallback
- * @param {Object} settings - Settings to save
- * @returns {Promise<boolean>} Success status
+ * Save site-specific settings
  */
-async function saveSettingsSafely(settings) {
-  const startTime = performance.now();
-  try {
-    if (!storageAvailable) {
-      logError('saveSettingsSafely', new Error('Storage unavailable, updating fallback only'), { settings });
-      Object.assign(fallbackSettings, settings);
-      return false;
-    }
-
-    await chrome.storage.sync.set(settings);
-    recordPerformance('storageWriteTime', performance.now() - startTime);
-    return true;
-  } catch (error) {
-    logError('saveSettingsSafely', error, { settings });
-    storageAvailable = false;
-    Object.assign(fallbackSettings, settings);
-    recordPerformance('storageWriteTime', performance.now() - startTime);
-    return false;
-  }
-}
-
-// Initialize dark theme on page load
-async function initDarkTheme() {
-  try {
-    console.log('[Dark Theme Extension] Initializing dark theme on page load...');
-
-    const settings = await getSettingsSafely([
-      'darkThemeEnabled',
-      'blacklist',
-      'siteSettings'
-    ]);
-
-    console.log('[Dark Theme Extension] Retrieved settings:', settings);
-
-    const currentSite = window.location.hostname;
-    const shouldApply = determineShouldApply(currentSite, settings);
-
-    console.log(`[Dark Theme Extension] Should apply dark theme to ${currentSite}:`, shouldApply);
-
-    if (shouldApply) {
-      console.log('[Dark Theme Extension] Applying dark theme');
-      applyDarkTheme();
-    } else {
-      console.log('[Dark Theme Extension] Dark theme not applied based on settings');
-    }
-
-    performanceMetrics.initEndTime = performance.now();
-    const totalTime = performanceMetrics.initEndTime - performanceMetrics.initStartTime;
-    console.log(`[Dark Theme Extension] Initialization completed in ${totalTime.toFixed(2)}ms`);
-  } catch (error) {
-    logError('initDarkTheme', error, {
-      hostname: window.location.hostname,
-      storageAvailable
-    });
-    performanceMetrics.initEndTime = performance.now();
-    // Graceful degradation: continue without dark theme
-  }
-}
-
-/**
- * Detect if site has native dark mode support
- * @returns {Object} Detection result with method and element
- */
-function detectNativeDarkMode() {
-  const detectionMethods = [
-    // Method 1: data-theme attribute
-    () => {
-      const themeElement = document.querySelector('[data-theme]');
-      if (themeElement) {
-        return { method: 'data-theme', element: themeElement, attribute: 'data-theme' };
-      }
-      return null;
-    },
-    // Method 2: class-based dark mode
-    () => {
-      const darkClasses = ['dark', 'dark-mode', 'theme-dark', 'darkmode'];
-      for (const className of darkClasses) {
-        if (document.documentElement.classList.contains(className) ||
-          document.body?.classList.contains(className)) {
-          return { method: 'class', className };
-        }
-      }
-      return null;
-    },
-    // Method 3: CSS color-scheme
-    () => {
-      const colorScheme = getComputedStyle(document.documentElement).colorScheme;
-      if (colorScheme && colorScheme.includes('dark')) {
-        return { method: 'color-scheme', value: colorScheme };
-      }
-      return null;
-    }
-  ];
-
-  for (const detect of detectionMethods) {
-    const result = detect();
-    if (result) {
-      return result;
-    }
-  }
-
-  return null;
-}
-
-/**
- * Activate native dark mode if available
- * @param {Object} detection - Detection result from detectNativeDarkMode
- * @returns {boolean} Success status
- */
-function activateNativeDarkMode(detection) {
-  try {
-    switch (detection.method) {
-      case 'data-theme':
-        detection.element.setAttribute(detection.attribute, 'dark');
-        console.log('[Dark Theme Extension] Activated native dark mode via data-theme');
-        return true;
-
-      case 'class':
-        if (!document.documentElement.classList.contains(detection.className)) {
-          document.documentElement.classList.add(detection.className);
-        }
-        console.log(`[Dark Theme Extension] Activated native dark mode via class: ${detection.className}`);
-        return true;
-
-      case 'color-scheme':
-        document.documentElement.style.colorScheme = 'dark';
-        console.log('[Dark Theme Extension] Activated native dark mode via color-scheme');
-        return true;
-
-      default:
-        return false;
-    }
-  } catch (error) {
-    logError('activateNativeDarkMode', error, { detection });
-    return false;
-  }
-}
-
-/**
- * Apply dark theme with hybrid approach
- * Tries native dark mode first, then falls back to custom implementation
- */
-function applyDarkTheme() {
-  const startTime = performance.now();
-  try {
-    // Check if document is ready for manipulation
-    if (!document.documentElement) {
-      throw new Error('Document element not available');
-    }
-
-    // Step 1: Detect native dark mode
-    const nativeDarkMode = detectNativeDarkMode();
-
-    if (nativeDarkMode) {
-      // Step 2: Try to activate native dark mode
-      const activated = activateNativeDarkMode(nativeDarkMode);
-
-      if (activated) {
-        // Still add our class for CSS variable overrides
-        document.documentElement.classList.add('dark-theme-active');
-        document.documentElement.setAttribute('data-dark-theme-mode', 'native');
-        console.log('[Dark Theme Extension] Using native dark mode with enhancements');
-      } else {
-        // Fallback to custom implementation
-        applyCustomDarkMode();
-      }
-    } else {
-      // Step 3: No native dark mode, use custom implementation
-      applyCustomDarkMode();
-    }
-
-    recordPerformance('applyThemeTime', performance.now() - startTime);
-    console.log('[Dark Theme Extension] Successfully applied dark theme');
-  } catch (error) {
-    logError('applyDarkTheme', error, {
-      documentReady: !!document.documentElement
-    });
-    recordPerformance('applyThemeTime', performance.now() - startTime);
-  }
-}
-
-/**
- * Apply custom dark mode implementation
- */
-function applyCustomDarkMode() {
-  document.documentElement.classList.add('dark-theme-active');
-  document.documentElement.setAttribute('data-dark-theme-mode', 'custom');
-  console.log('[Dark Theme Extension] Applied custom dark mode');
-}
-
-/**
- * Remove dark theme (both native and custom)
- */
-function removeDarkTheme() {
-  const startTime = performance.now();
-  try {
-    // Check if document is ready for manipulation
-    if (!document.documentElement) {
-      throw new Error('Document element not available');
-    }
-
-    const mode = document.documentElement.getAttribute('data-dark-theme-mode');
-
-    // Remove our custom class
-    document.documentElement.classList.remove('dark-theme-active');
-
-    // If we activated native dark mode, try to deactivate it
-    if (mode === 'native') {
-      const nativeDarkMode = detectNativeDarkMode();
-      if (nativeDarkMode) {
-        deactivateNativeDarkMode(nativeDarkMode);
-      }
-    }
-
-    // Clean up attributes
-    document.documentElement.removeAttribute('data-dark-theme-mode');
-
-    recordPerformance('removeThemeTime', performance.now() - startTime);
-    console.log('[Dark Theme Extension] Successfully removed dark theme');
-  } catch (error) {
-    logError('removeDarkTheme', error, {
-      documentReady: !!document.documentElement
-    });
-    recordPerformance('removeThemeTime', performance.now() - startTime);
-  }
-}
-
-/**
- * Deactivate native dark mode
- * @param {Object} detection - Detection result from detectNativeDarkMode
- */
-function deactivateNativeDarkMode(detection) {
-  try {
-    switch (detection.method) {
-      case 'data-theme':
-        detection.element.setAttribute(detection.attribute, 'light');
-        console.log('[Dark Theme Extension] Deactivated native dark mode via data-theme');
-        break;
-
-      case 'class':
-        document.documentElement.classList.remove(detection.className);
-        console.log(`[Dark Theme Extension] Deactivated native dark mode via class: ${detection.className}`);
-        break;
-
-      case 'color-scheme':
-        document.documentElement.style.colorScheme = 'light';
-        console.log('[Dark Theme Extension] Deactivated native dark mode via color-scheme');
-        break;
-    }
-  } catch (error) {
-    logError('deactivateNativeDarkMode', error, { detection });
-  }
-}
-
-// Determine if dark theme should be applied to the current site
-function determineShouldApply(site, settings) {
-  try {
-    // Validate inputs
-    if (!site || typeof site !== 'string') {
-      logError('determineShouldApply', new Error('Invalid site parameter'), { site });
-      return false;
-    }
-
-    if (!settings || typeof settings !== 'object') {
-      logError('determineShouldApply', new Error('Invalid settings parameter'), { settings });
-      return false;
-    }
-
-    // Check blacklist first (highest priority)
-    if (Array.isArray(settings.blacklist) && settings.blacklist.includes(site)) {
-      console.log(`[Dark Theme Extension] Site ${site} is blacklisted - dark theme will NOT be applied`);
-      return false;
-    }
-
-    // Check site-specific settings
-    if (settings.siteSettings?.[site]?.enabled !== undefined) {
-      const enabled = settings.siteSettings[site].enabled;
-      console.log(`[Dark Theme Extension] Site ${site} has site-specific setting: ${enabled ? 'enabled' : 'disabled'}`);
-      return enabled;
-    }
-
-    // Default to global setting (enabled by default)
-    const globalEnabled = settings.darkThemeEnabled !== undefined ? settings.darkThemeEnabled : true;
-    console.log(`[Dark Theme Extension] Using global setting for ${site}: ${globalEnabled ? 'enabled' : 'disabled'}`);
-    return globalEnabled;
-  } catch (error) {
-    logError('determineShouldApply', error, { site, settings });
-    return false; // Fail safe: don't apply theme if error occurs
-  }
-}
-
-// Save site-specific settings
 async function saveSiteSettings(site, enabled) {
   try {
-    // Validate inputs
-    if (!site || typeof site !== 'string') {
-      throw new Error('Invalid site parameter');
-    }
-
-    const { siteSettings = {} } = await getSettingsSafely(['siteSettings']);
-
-    siteSettings[site] = {
-      enabled,
-      lastModified: Date.now()
-    };
-
-    const saved = await saveSettingsSafely({ siteSettings });
-
-    if (!saved) {
-      console.warn('[Dark Theme Extension] Settings saved to fallback only (storage unavailable)');
-    }
+    const { siteSettings = {} } = await chrome.storage.sync.get('siteSettings');
+    siteSettings[site] = { enabled, lastModified: Date.now() };
+    await chrome.storage.sync.set({ siteSettings });
   } catch (error) {
-    logError('saveSiteSettings', error, { site, enabled, storageAvailable });
+    console.error('[Dark Theme] Save error:', error);
   }
 }
 
-// Handle settings updates from other tabs
-async function handleSettingsUpdate(changes) {
+/**
+ * Calculate relative luminance (WCAG formula)
+ */
+function getLuminance(r, g, b) {
+  const [rs, gs, bs] = [r, g, b].map(c => {
+    c = c / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+/**
+ * Calculate contrast ratio between two colors
+ */
+function getContrastRatio(rgb1, rgb2) {
+  const lum1 = getLuminance(rgb1[0], rgb1[1], rgb1[2]);
+  const lum2 = getLuminance(rgb2[0], rgb2[1], rgb2[2]);
+  const lighter = Math.max(lum1, lum2);
+  const darker = Math.min(lum1, lum2);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+/**
+ * Parse RGB color string to array
+ */
+function parseRGB(colorString) {
+  const match = colorString.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  return match ? [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])] : null;
+}
+
+/**
+ * Detect if page already has dark theme
+ */
+function detectPageTheme() {
+  const body = document.body;
+  if (!body) return 'unknown';
+
+  const bgColor = window.getComputedStyle(body).backgroundColor;
+  const rgb = parseRGB(bgColor);
+
+  if (!rgb) return 'unknown';
+
+  const luminance = getLuminance(rgb[0], rgb[1], rgb[2]);
+  return luminance < 0.5 ? 'dark' : 'light';
+}
+
+/**
+ * Analyze contrast of elements on page
+ */
+function analyzePageContrast() {
+  const samples = [];
+  const elements = document.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, div, a');
+
+  // Sample up to 50 text elements
+  const sampleSize = Math.min(50, elements.length);
+  for (let i = 0; i < sampleSize; i++) {
+    const el = elements[Math.floor(Math.random() * elements.length)];
+    const styles = window.getComputedStyle(el);
+
+    const bgColor = parseRGB(styles.backgroundColor);
+    const textColor = parseRGB(styles.color);
+
+    if (bgColor && textColor) {
+      const contrast = getContrastRatio(bgColor, textColor);
+      samples.push({ element: el.tagName, contrast });
+    }
+  }
+
+  if (samples.length === 0) return null;
+
+  const avgContrast = samples.reduce((sum, s) => sum + s.contrast, 0) / samples.length;
+  const lowContrast = samples.filter(s => s.contrast < 4.5).length;
+
+  return {
+    average: avgContrast,
+    lowContrastCount: lowContrast,
+    totalSamples: samples.length,
+    needsImprovement: avgContrast < 4.5 || lowContrast > samples.length * 0.3
+  };
+}
+
+/**
+ * Initialize dark theme
+ */
+async function initDarkTheme() {
   try {
-    // Get current settings to determine what changed
-    const settings = await getSettingsSafely([
-      'darkThemeEnabled',
-      'blacklist',
-      'siteSettings'
-    ]);
+    await getSettings();
 
     const currentSite = window.location.hostname;
+    const shouldApply = determineShouldApply(currentSite);
 
-    // Validate we can access DOM
-    if (!document.documentElement) {
-      throw new Error('Document element not available');
-    }
-
-    const shouldApply = determineShouldApply(currentSite, settings);
-    const isCurrentlyActive = document.documentElement.classList.contains('dark-theme-active');
-
-    // Determine if we need to apply or remove the theme
-    if (shouldApply && !isCurrentlyActive) {
-      // Theme should be active but isn't - apply it
+    if (shouldApply) {
       applyDarkTheme();
-      console.log('[Dark Theme Extension] Applied theme due to settings update from another tab');
-    } else if (!shouldApply && isCurrentlyActive) {
-      // Theme is active but shouldn't be - remove it
-      removeDarkTheme();
-      console.log('[Dark Theme Extension] Removed theme due to settings update from another tab');
     }
   } catch (error) {
-    logError('handleSettingsUpdate', error, {
-      changes,
-      storageAvailable,
-      documentReady: !!document.documentElement
-    });
+    console.error('[Dark Theme] Init error:', error);
   }
 }
 
-// Listen for messages from popup and background script
+/**
+ * Detect and activate native dark mode
+ */
+function detectAndActivateNative() {
+  // Check data-theme attribute
+  const themeEl = document.querySelector('[data-theme]');
+  if (themeEl) {
+    themeEl.setAttribute('data-theme', 'dark');
+    return 'data-theme';
+  }
+
+  // Check for dark mode classes
+  const darkClasses = ['dark', 'dark-mode', 'theme-dark'];
+  for (const cls of darkClasses) {
+    if (document.documentElement.classList.contains(cls)) {
+      return 'class-exists';
+    }
+  }
+
+  // Try adding dark class
+  document.documentElement.classList.add('dark');
+  return 'class-added';
+}
+
+/**
+ * Apply dark theme with contrast awareness
+ */
+function applyDarkTheme() {
+  if (!document.documentElement) return;
+
+  // Try native dark mode first
+  const nativeMethod = detectAndActivateNative();
+
+  // Always add our enhancement class
+  document.documentElement.classList.add('dark-theme-active');
+  document.documentElement.setAttribute('data-dark-mode', nativeMethod);
+
+  console.log('[Dark Theme] Applied with method:', nativeMethod);
+
+  // Analyze and improve contrast if needed
+  setTimeout(() => {
+    const contrast = analyzePageContrast();
+    if (contrast?.needsImprovement) {
+      document.documentElement.setAttribute('data-contrast-boost', 'true');
+      console.log('[Dark Theme] Contrast boost enabled', contrast);
+    }
+  }, 500);
+}
+
+/**
+ * Remove dark theme
+ */
+function removeDarkTheme() {
+  if (!document.documentElement) return;
+
+  const method = document.documentElement.getAttribute('data-dark-mode');
+
+  // Revert native changes
+  if (method === 'data-theme') {
+    const themeEl = document.querySelector('[data-theme]');
+    if (themeEl) themeEl.setAttribute('data-theme', 'light');
+  } else if (method === 'class-added') {
+    document.documentElement.classList.remove('dark');
+  }
+
+  // Remove our classes
+  document.documentElement.classList.remove('dark-theme-active');
+  document.documentElement.removeAttribute('data-dark-mode');
+  document.documentElement.removeAttribute('data-contrast-boost');
+}
+
+/**
+ * Determine if dark theme should be applied
+ */
+function determineShouldApply(site) {
+  // Check blacklist
+  if (settings.blacklist?.includes(site)) {
+    return false;
+  }
+
+  // Check site-specific setting
+  if (settings.siteSettings?.[site]?.enabled !== undefined) {
+    return settings.siteSettings[site].enabled;
+  }
+
+  // Use global setting
+  return settings.darkThemeEnabled !== false;
+}
+
+/**
+ * Handle settings updates
+ */
+async function handleSettingsUpdate() {
+  await getSettings();
+
+  const currentSite = window.location.hostname;
+  const shouldApply = determineShouldApply(currentSite);
+  const isActive = document.documentElement?.classList.contains('dark-theme-active');
+
+  if (shouldApply && !isActive) {
+    applyDarkTheme();
+  } else if (!shouldApply && isActive) {
+    removeDarkTheme();
+  }
+}
+
+/**
+ * Message handler
+ */
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  const messageStartTime = performance.now();
-  try {
-    // Validate message structure
-    if (!message || typeof message !== 'object' || !message.type) {
-      throw new Error('Invalid message format');
-    }
-
-    const currentSite = window.location.hostname;
-
-    switch (message.type) {
-      case 'TOGGLE_DARK_THEME':
-        try {
-          if (message.enabled) {
-            applyDarkTheme();
-            saveSiteSettings(currentSite, true);
-          } else {
-            removeDarkTheme();
-            saveSiteSettings(currentSite, false);
-          }
-          recordPerformance('messageHandlingTime', performance.now() - messageStartTime);
-          sendResponse({ success: true });
-        } catch (error) {
-          logError('TOGGLE_DARK_THEME handler', error, { message });
-          recordPerformance('messageHandlingTime', performance.now() - messageStartTime);
-          sendResponse({ success: false, error: error.message });
-        }
-        break;
-
-      case 'SETTINGS_UPDATED':
-        // Handle settings changes from other tabs
-        handleSettingsUpdate(message.changes)
-          .then(() => {
-            recordPerformance('messageHandlingTime', performance.now() - messageStartTime);
-            sendResponse({ success: true });
-          })
-          .catch((error) => {
-            logError('SETTINGS_UPDATED handler', error, { message });
-            recordPerformance('messageHandlingTime', performance.now() - messageStartTime);
-            sendResponse({ success: false, error: error.message });
-          });
-        return true; // Keep channel open for async response
-
-      case 'GET_PERFORMANCE_STATS':
-        // Return performance statistics
-        sendResponse({ success: true, stats: getPerformanceStats() });
-        break;
-
-      default:
-        logError('Message handler', new Error('Unknown message type'), { messageType: message.type });
-        recordPerformance('messageHandlingTime', performance.now() - messageStartTime);
-        sendResponse({ success: false, error: 'Unknown message type' });
-    }
-  } catch (error) {
-    logError('Message handler', error, { message });
-    recordPerformance('messageHandlingTime', performance.now() - messageStartTime);
-    sendResponse({ success: false, error: error.message });
+  if (!message?.type) {
+    sendResponse({ success: false });
+    return;
   }
 
-  return true; // Keep message channel open for async response
-});
+  const currentSite = window.location.hostname;
 
-// Listen for storage changes directly (additional sync mechanism)
-chrome.storage.onChanged.addListener((changes, areaName) => {
-  try {
-    if (areaName === 'sync') {
-      console.log('[Dark Theme Extension] Storage changed, syncing theme state');
-      handleSettingsUpdate(changes);
-    }
-  } catch (error) {
-    logError('Storage change listener', error, { changes, areaName });
+  switch (message.type) {
+    case 'TOGGLE_DARK_THEME':
+      if (message.enabled) {
+        applyDarkTheme();
+        saveSiteSettings(currentSite, true);
+      } else {
+        removeDarkTheme();
+        saveSiteSettings(currentSite, false);
+      }
+      sendResponse({ success: true });
+      break;
+
+    case 'SETTINGS_UPDATED':
+      handleSettingsUpdate().then(() => {
+        sendResponse({ success: true });
+      });
+      return true; // Async response
+
+    case 'ANALYZE_CONTRAST':
+      const contrast = analyzePageContrast();
+      const theme = detectPageTheme();
+      sendResponse({ success: true, contrast, theme });
+      break;
+
+    default:
+      sendResponse({ success: false });
   }
 });
 
-// Check if we're on a restricted page
-function isRestrictedPage() {
-  const url = window.location.href;
-  const restrictedProtocols = ['chrome:', 'chrome-extension:', 'edge:', 'about:'];
+/**
+ * Storage change listener
+ */
+chrome.storage.onChanged.addListener((_changes, area) => {
+  if (area === 'sync') {
+    handleSettingsUpdate();
+  }
+});
 
-  return restrictedProtocols.some(protocol => url.startsWith(protocol));
+/**
+ * Watch for dynamic content changes
+ */
+function observeDynamicContent() {
+  const observer = new MutationObserver(() => {
+    // Re-check if theme is still applied
+    if (document.documentElement.classList.contains('dark-theme-active')) {
+      // Theme is active, ensure it stays applied
+      const contrast = analyzePageContrast();
+      if (contrast?.needsImprovement &&
+        !document.documentElement.hasAttribute('data-contrast-boost')) {
+        document.documentElement.setAttribute('data-contrast-boost', 'true');
+        console.log('[Dark Theme] Contrast boost enabled after content change');
+      }
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
 }
 
-// Initialize on script load with safety checks
-(function () {
-  try {
-    // Check if we're on a restricted page
-    if (isRestrictedPage()) {
-      console.log('[Dark Theme Extension] Skipping initialization on restricted page:', window.location.href);
-      return;
-    }
+/**
+ * Initialize
+ */
+(function init() {
+  const url = window.location.href;
 
-    // Check if document is ready
-    if (document.readyState === 'loading') {
-      // Wait for DOM to be ready
-      document.addEventListener('DOMContentLoaded', () => {
-        initDarkTheme();
-      });
-    } else {
-      // DOM is already ready
+  // Skip restricted pages
+  if (url.startsWith('chrome:') || url.startsWith('chrome-extension:') ||
+    url.startsWith('edge:') || url.startsWith('about:')) {
+    return;
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
       initDarkTheme();
-    }
-  } catch (error) {
-    logError('Script initialization', error, {
-      url: window.location.href,
-      readyState: document.readyState
+      setTimeout(observeDynamicContent, 1000);
     });
+  } else {
+    initDarkTheme();
+    setTimeout(observeDynamicContent, 1000);
   }
 })();
