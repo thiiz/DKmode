@@ -186,7 +186,89 @@ async function initDarkTheme() {
   }
 }
 
-// Apply dark theme
+/**
+ * Detect if site has native dark mode support
+ * @returns {Object} Detection result with method and element
+ */
+function detectNativeDarkMode() {
+  const detectionMethods = [
+    // Method 1: data-theme attribute
+    () => {
+      const themeElement = document.querySelector('[data-theme]');
+      if (themeElement) {
+        return { method: 'data-theme', element: themeElement, attribute: 'data-theme' };
+      }
+      return null;
+    },
+    // Method 2: class-based dark mode
+    () => {
+      const darkClasses = ['dark', 'dark-mode', 'theme-dark', 'darkmode'];
+      for (const className of darkClasses) {
+        if (document.documentElement.classList.contains(className) ||
+          document.body?.classList.contains(className)) {
+          return { method: 'class', className };
+        }
+      }
+      return null;
+    },
+    // Method 3: CSS color-scheme
+    () => {
+      const colorScheme = getComputedStyle(document.documentElement).colorScheme;
+      if (colorScheme && colorScheme.includes('dark')) {
+        return { method: 'color-scheme', value: colorScheme };
+      }
+      return null;
+    }
+  ];
+
+  for (const detect of detectionMethods) {
+    const result = detect();
+    if (result) {
+      return result;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Activate native dark mode if available
+ * @param {Object} detection - Detection result from detectNativeDarkMode
+ * @returns {boolean} Success status
+ */
+function activateNativeDarkMode(detection) {
+  try {
+    switch (detection.method) {
+      case 'data-theme':
+        detection.element.setAttribute(detection.attribute, 'dark');
+        console.log('[Dark Theme Extension] Activated native dark mode via data-theme');
+        return true;
+
+      case 'class':
+        if (!document.documentElement.classList.contains(detection.className)) {
+          document.documentElement.classList.add(detection.className);
+        }
+        console.log(`[Dark Theme Extension] Activated native dark mode via class: ${detection.className}`);
+        return true;
+
+      case 'color-scheme':
+        document.documentElement.style.colorScheme = 'dark';
+        console.log('[Dark Theme Extension] Activated native dark mode via color-scheme');
+        return true;
+
+      default:
+        return false;
+    }
+  } catch (error) {
+    logError('activateNativeDarkMode', error, { detection });
+    return false;
+  }
+}
+
+/**
+ * Apply dark theme with hybrid approach
+ * Tries native dark mode first, then falls back to custom implementation
+ */
 function applyDarkTheme() {
   const startTime = performance.now();
   try {
@@ -195,7 +277,26 @@ function applyDarkTheme() {
       throw new Error('Document element not available');
     }
 
-    document.documentElement.classList.add('dark-theme-active');
+    // Step 1: Detect native dark mode
+    const nativeDarkMode = detectNativeDarkMode();
+
+    if (nativeDarkMode) {
+      // Step 2: Try to activate native dark mode
+      const activated = activateNativeDarkMode(nativeDarkMode);
+
+      if (activated) {
+        // Still add our class for CSS variable overrides
+        document.documentElement.classList.add('dark-theme-active');
+        document.documentElement.setAttribute('data-dark-theme-mode', 'native');
+        console.log('[Dark Theme Extension] Using native dark mode with enhancements');
+      } else {
+        // Fallback to custom implementation
+        applyCustomDarkMode();
+      }
+    } else {
+      // Step 3: No native dark mode, use custom implementation
+      applyCustomDarkMode();
+    }
 
     recordPerformance('applyThemeTime', performance.now() - startTime);
     console.log('[Dark Theme Extension] Successfully applied dark theme');
@@ -207,7 +308,18 @@ function applyDarkTheme() {
   }
 }
 
-// Remove dark theme
+/**
+ * Apply custom dark mode implementation
+ */
+function applyCustomDarkMode() {
+  document.documentElement.classList.add('dark-theme-active');
+  document.documentElement.setAttribute('data-dark-theme-mode', 'custom');
+  console.log('[Dark Theme Extension] Applied custom dark mode');
+}
+
+/**
+ * Remove dark theme (both native and custom)
+ */
 function removeDarkTheme() {
   const startTime = performance.now();
   try {
@@ -216,7 +328,21 @@ function removeDarkTheme() {
       throw new Error('Document element not available');
     }
 
+    const mode = document.documentElement.getAttribute('data-dark-theme-mode');
+
+    // Remove our custom class
     document.documentElement.classList.remove('dark-theme-active');
+
+    // If we activated native dark mode, try to deactivate it
+    if (mode === 'native') {
+      const nativeDarkMode = detectNativeDarkMode();
+      if (nativeDarkMode) {
+        deactivateNativeDarkMode(nativeDarkMode);
+      }
+    }
+
+    // Clean up attributes
+    document.documentElement.removeAttribute('data-dark-theme-mode');
 
     recordPerformance('removeThemeTime', performance.now() - startTime);
     console.log('[Dark Theme Extension] Successfully removed dark theme');
@@ -225,6 +351,33 @@ function removeDarkTheme() {
       documentReady: !!document.documentElement
     });
     recordPerformance('removeThemeTime', performance.now() - startTime);
+  }
+}
+
+/**
+ * Deactivate native dark mode
+ * @param {Object} detection - Detection result from detectNativeDarkMode
+ */
+function deactivateNativeDarkMode(detection) {
+  try {
+    switch (detection.method) {
+      case 'data-theme':
+        detection.element.setAttribute(detection.attribute, 'light');
+        console.log('[Dark Theme Extension] Deactivated native dark mode via data-theme');
+        break;
+
+      case 'class':
+        document.documentElement.classList.remove(detection.className);
+        console.log(`[Dark Theme Extension] Deactivated native dark mode via class: ${detection.className}`);
+        break;
+
+      case 'color-scheme':
+        document.documentElement.style.colorScheme = 'light';
+        console.log('[Dark Theme Extension] Deactivated native dark mode via color-scheme');
+        break;
+    }
+  } catch (error) {
+    logError('deactivateNativeDarkMode', error, { detection });
   }
 }
 

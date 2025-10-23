@@ -1,20 +1,49 @@
 /* Dark Theme Extension - Content Styles */
+/* Hybrid Approach: CSS Variables Override + Intelligent Fallback */
 
-/* CSS Custom Properties */
+/* CSS Custom Properties - Our Dark Theme Palette */
 :root {
-  --dark-bg: hsl(0, 0%, 10%);
-  --dark-text: hsl(0, 0%, 90%);
-  --dark-border: hsl(0, 0%, 30%);
+  --dark-bg: #0d1117;
+  --dark-bg-secondary: #161b22;
+  --dark-bg-tertiary: #1f2428;
+  --dark-text: #c9d1d9;
+  --dark-text-secondary: #8b949e;
+  --dark-border: #30363d;
+  --dark-accent: #58a6ff;
 }
 
-/* Base Dark Theme Styles */
+/* Base Dark Theme - Override Common CSS Variables */
 .dark-theme-active {
+  /* Override site's CSS variables if they exist */
+  --background: var(--dark-bg) !important;
+  --background-color: var(--dark-bg) !important;
+  --bg: var(--dark-bg) !important;
+  --bg-color: var(--dark-bg) !important;
+  --color-bg: var(--dark-bg) !important;
+  --surface: var(--dark-bg) !important;
+  
+  --text: var(--dark-text) !important;
+  --text-color: var(--dark-text) !important;
+  --color-text: var(--dark-text) !important;
+  --foreground: var(--dark-text) !important;
+  
+  --border: var(--dark-border) !important;
+  --border-color: var(--dark-border) !important;
+  --color-border: var(--dark-border) !important;
+  
+  --primary: var(--dark-accent) !important;
+  --primary-color: var(--dark-accent) !important;
+  --accent: var(--dark-accent) !important;
+  --accent-color: var(--dark-accent) !important;
+  
+  /* Fallback for root element */
   background-color: var(--dark-bg) !important;
   color: var(--dark-text) !important;
+  color-scheme: dark !important;
 }
 
-/* Apply dark theme to all elements except media */
-.dark-theme-active *:not(img):not(video):not(canvas):not(svg) {
+/* Intelligent Fallback - Only apply if element doesn't use CSS variables */
+.dark-theme-active *:not(img):not(video):not(canvas):not(svg):not([style*="background"]) {
   background-color: var(--dark-bg) !important;
   color: var(--dark-text) !important;
   border-color: var(--dark-border) !important;
